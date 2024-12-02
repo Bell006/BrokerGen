@@ -1,0 +1,10 @@
+Flask
+gspread
+Flask-CORS
+Pillow
+python-dotenv
+google-auth
+google-auth-oauthlib
+google-api-python-client
+unidecode
+Gunicorn
