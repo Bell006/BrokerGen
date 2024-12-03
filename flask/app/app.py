@@ -39,17 +39,15 @@ def create_broker_images():
 
         # Validates name
         validate_name(name)
-
-        font_path_bold = os.path.join(app.root_path, 'static', 'fonts', 'Lato-Bold.ttf')
         
-        box_position_feed = (142, 1020)
-        box_position_stories = (310, 1620)
+        box_position_feed = (150, 1025)
+        box_position_stories = (312, 1615)
 
-        box_position_stories_condicoes = (120, 1600)
-        box_position_feed_condicoes1 = (718, 970)
+        box_position_stories_condicoes = (120, 1560)
+        box_position_feed_condicoes1 = (718, 955)
         box_position_feed_condicoes2 = (120, 1020)
 
-        box_position_feed_else = (725, 1050)
+        box_position_feed_else = (745, 1025)
 
         # List to hold links for all generated images
         generated_images = []
@@ -60,17 +58,17 @@ def create_broker_images():
             template_image_path_stories = os.path.join(app.root_path, 'static', 'assets', f'peça_{category}_stories.jpg')
 
             if category == 'condicoes1':
-                feed_link = generate_image(template_image_path_feed, name, formatted_phone,  font_path_bold, box_position_feed_condicoes1)
-                stories_link = generate_image(template_image_path_stories, name, formatted_phone,  font_path_bold, box_position_stories_condicoes)
+                feed_link = generate_image(template_image_path_feed, name, formatted_phone, creci, box_position_feed_condicoes1)
+                stories_link = generate_image(template_image_path_stories, name, formatted_phone, creci, box_position_stories_condicoes)
             elif category == 'condicoes2':
-                feed_link = generate_image(template_image_path_feed, name, formatted_phone,  font_path_bold, box_position_feed_condicoes2)
-                stories_link = generate_image(template_image_path_stories, name, formatted_phone,  font_path_bold, box_position_stories_condicoes)
+                feed_link = generate_image(template_image_path_feed, name, formatted_phone, creci, box_position_feed_condicoes2)
+                stories_link = generate_image(template_image_path_stories, name, formatted_phone, creci, box_position_stories_condicoes)
             elif category == 'general' or category == 'investidor':
-                feed_link = generate_image(template_image_path_feed, name, formatted_phone,  font_path_bold, box_position_feed)
-                stories_link = generate_image(template_image_path_stories, name, formatted_phone,  font_path_bold, box_position_stories)
+                feed_link = generate_image(template_image_path_feed, name, formatted_phone, creci, box_position_feed)
+                stories_link = generate_image(template_image_path_stories, name, formatted_phone, creci, box_position_stories)
             else:
-                feed_link = generate_image(template_image_path_feed, name, formatted_phone,  font_path_bold, box_position_feed_else)
-                stories_link = generate_image(template_image_path_stories, name, formatted_phone,  font_path_bold, box_position_stories)
+                feed_link = generate_image(template_image_path_feed, name, formatted_phone, creci, box_position_feed_else)
+                stories_link = generate_image(template_image_path_stories, name, formatted_phone, creci, box_position_stories)
 
             generated_images.append({
                 'category': category,
@@ -91,4 +89,4 @@ def create_broker_images():
         return jsonify({'message': 'Erro ao criar a peça. Por favor, tente novamente mais tarde.'}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)

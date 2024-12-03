@@ -60,89 +60,81 @@ def draw_rounded_rectangle(draw, xy, width, height, radius, outline, fill=None, 
     if fill:
         draw.rectangle([x + radius, y + radius, right - radius, bottom - radius], fill=fill)
 
-def generate_image(template_path, name, phone, font_path_bold, box_position):
-    # Open the template image
+def generate_image(template_path, name, phone, creci, box_position):
+
+    root_path = os.path.dirname(os.path.abspath(__file__))
+    font_path_bold = os.path.join(root_path, 'static', 'fonts', 'Lato-Bold.ttf')
+    font_path_black = os.path.join(root_path, 'static', 'fonts', 'Lato-Black.ttf')
+
+    # Abrir a imagem de template
     image = Image.open(template_path)
 
-    # Create a drawing context
+    # Criar um contexto de desenho
     draw = ImageDraw.Draw(image)
 
     box_width = 456
     box_height = 127
-    box_radius = 32
-
-    draw_rounded_rectangle(
-        draw=draw,
-        xy=box_position,
-        width=box_width,
-        height=box_height,
-        radius=box_radius,
-        outline="#FFFFFF",
-        fill=None,
-        border_width=1,
-    )
-
-    # Font config
-    max_font_size = 35
-    min_font_size = 10
     margin = 15
 
-    # Área útil do retângulo
-    inner_width = box_width - 2 * margin
-    inner_height = box_height - 2 * margin
+    # Configuração das fontes
+    max_font_size = 35
+    min_font_size = 10
 
     # Textos a serem desenhados
     name_text = name
+    creci_text = f"Creci: {creci.split('-')[-1]}-TO"
     phone_text = phone
+    
+    # Função auxiliar para ajustar fonte ao espaço
+    def adjust_font_size(text, max_width, font_path, max_font_size, min_font_size):
+        font_size = max_font_size
+        while font_size >= min_font_size:
+            font = ImageFont.truetype(font_path, font_size)
+            bbox = draw.textbbox((0, 0), text, font=font)
+            text_width = bbox[2] - bbox[0]
+            if text_width <= max_width:
+                return font
+            font_size -= 1
+        return ImageFont.truetype(font_path, min_font_size)
 
-    # Ajustar fonte para nome
-    font_size = max_font_size
-    while font_size >= min_font_size:
-        font_name = ImageFont.truetype(font_path_bold, font_size)
-        bbox = draw.textbbox((0, 0), name_text, font=font_name)
-        name_width, name_height = bbox[2] - bbox[0], bbox[3] - bbox[1]
+    # Ajustar fontes para cada texto
+    name_font = adjust_font_size(name_text, box_width - 2 * margin, font_path_black, max_font_size, min_font_size)
+    creci_font = adjust_font_size(creci_text, box_width - 2 * margin, font_path_bold, max_font_size - 7, min_font_size)
+    phone_font = adjust_font_size(phone_text, box_width - 2 * margin, font_path_black, max_font_size, min_font_size)
 
-        # Verificar se o texto se aproxima das bordas laterais
-        if name_width <= inner_width and name_height <= inner_height / 2:
-            if (inner_width - name_width) / 2 >= 15:  # Distância da borda
-                break
-        font_size -= 1
+    # Determinar as alturas dos textos
+    name_height = draw.textbbox((0, 0), name_text, font=name_font)[3]
+    creci_height = draw.textbbox((0, 0), creci_text, font=creci_font)[3]
+    phone_height = draw.textbbox((0, 0), phone_text, font=phone_font)[3]
 
-    # Ajustar fonte para telefone
-    font_size = max_font_size
-    while font_size >= min_font_size:
-        font_phone = ImageFont.truetype(font_path_bold, font_size)
-        bbox = draw.textbbox((0, 0), phone_text, font=font_phone)
-        phone_width, phone_height = bbox[2] - bbox[0], bbox[3] - bbox[1]
+    # Diminuir espaçamento entre as linhas
+    line_spacing = 4
 
-        # Verificar se o texto se aproxima das bordas laterais
-        if phone_width <= inner_width and phone_height <= inner_height / 2:
-            if (inner_width - phone_width) / 2 >= 15:  # Distância da borda
-                break
-        font_size -= 1
+    total_text_height = name_height + creci_height + phone_height + 2 * line_spacing
 
-    # Calcular a altura total do texto (nome + telefone + espaço entre eles)
-    total_text_height = name_height + phone_height + 20
+    # Posição vertical centralizada dentro do box
+    y_offset = (box_height - total_text_height) / 2
 
-    # Calcular posição vertical centralizada no retângulo
-    total_y_offset = (inner_height - total_text_height) / 2
+    # Calcular posições dos textos
+    name_x = box_position[0] + (box_width - draw.textbbox((0, 0), name_text, font=name_font)[2]) / 2
+    name_y = box_position[1] + margin + y_offset
 
-    # Calcular posições centralizadas para nome e telefone
-    name_x = box_position[0] + (box_width - name_width) / 2
-    name_y = box_position[1] + margin + total_y_offset
+    creci_x = box_position[0] + (box_width - draw.textbbox((0, 0), creci_text, font=creci_font)[2]) / 2
+    creci_y = name_y + name_height + line_spacing
 
-    phone_x = box_position[0] + (box_width - phone_width) / 2
-    phone_y = name_y + name_height + 10
+    phone_x = box_position[0] + (box_width - draw.textbbox((0, 0), phone_text, font=phone_font)[2]) / 2
+    phone_y = creci_y + creci_height + line_spacing
 
-    # Desenhar textos
-    draw.text((name_x, name_y), name_text, font=font_name, fill="#FFFFFF")
-    draw.text((phone_x, phone_y), phone_text, font=font_phone, fill="#FFFFFF")
+    # Desenhar os textos na imagem
+    draw.text((name_x, name_y), name_text, font=name_font, fill="#FFFFFF")
+    draw.text((creci_x, creci_y), creci_text, font=creci_font, fill="#FFFFFF")
+    draw.text((phone_x, phone_y), phone_text, font=phone_font, fill="#FFFFFF")
 
+    # Salvar a imagem
     template_base_name = os.path.basename(template_path)
     template_name, _ = os.path.splitext(template_base_name)
-
-    # Final name
     output_filename = f"{name.replace(' ', '_')}_{template_name}.jpg"
+
 
     # Save image
     with tempfile.NamedTemporaryFile(suffix='.jpg', delete=False) as temp_file:

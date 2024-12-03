@@ -17,15 +17,16 @@ function App() {
   const [loading, setLoading] = useState(false);
   
   const categories = [
-    { value: 'condicoes1', label: 'Condições - 1' },
-    { value: 'condicoes2', label: 'Condições - 2' },
-    { value: 'general', label: 'Geral' },
     { value: 'investidor', label: 'Investidor' },
     { value: 'localizacao', label: 'Localização' },
     { value: 'petplace', label: 'Pet Place' },
-    { value: 'playground', label: 'Playground' },
     { value: 'poliesportiva', label: 'Quadra poliesportiva' },
+    { value: 'condicoes1', label: 'Condições - 1' },
+    { value: 'condicoes2', label: 'Condições - 2' },
+    { value: 'general', label: 'Geral' },
+    { value: 'playground', label: 'Playground' },
     { value: 'quadraAreia', label: 'Quadra de areia' },
+    { value: 'areaLazer', label: 'Área de lazer' },
   ];
 
 
@@ -34,18 +35,30 @@ function App() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-
+  
     if (type === "checkbox") {
       setFormData(prevState => {
-        const updatedCategories = checked
-          ? [...prevState.categories, value]
-          : prevState.categories.filter(category => category !== value);
-
-        return {
-          ...prevState,
-          categories: updatedCategories
-        };
+        if (checked) {
+          if (prevState.categories.length >= 5) {
+            return prevState;
+          }
+  
+          return {
+            ...prevState,
+            categories: [...prevState.categories, value]
+          };
+        } else {
+          const updatedCategories = prevState.categories.filter(category => category !== value);
+          return {
+            ...prevState,
+            categories: updatedCategories
+          };
+        }
       });
+  
+      if (checked && formData.categories.length >= 5) {
+        alert("Selecione no máximo 5 categorias por vez.");
+      }
     } else {
       setFormData(prevState => ({
         ...prevState,
@@ -53,7 +66,6 @@ function App() {
       }));
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -99,7 +111,7 @@ function App() {
         <form onSubmit={handleSubmit}>
           <div className="inputWrapper">
             <label>
-              Nome e sobrenome:
+              Nome:
             </label>
             <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder='Maria da Silva' required />
           </div>
