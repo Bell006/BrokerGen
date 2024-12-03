@@ -4,7 +4,7 @@ import tempfile
 from PIL import Image, ImageDraw, ImageFont
 from dotenv import load_dotenv
 from googleapiclient.http import MediaFileUpload
-from app.google_api import add_to_google_sheet, drive_service
+from app.google_api import drive_service
 
 from app.app_error import AppError
 
@@ -137,9 +137,6 @@ def generate_image(template_path, name, phone, font_path_bold, box_position):
     # Desenhar textos
     draw.text((name_x, name_y), name_text, font=font_name, fill="#FFFFFF")
     draw.text((phone_x, phone_y), phone_text, font=font_phone, fill="#FFFFFF")
-
-    temp_image_path = os.path.join('static', 'temp_image.jpg')
-    image.save(temp_image_path)
 
     template_base_name = os.path.basename(template_path)
     template_name, _ = os.path.splitext(template_base_name)

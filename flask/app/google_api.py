@@ -1,4 +1,3 @@
-# google_api.py
 import os
 from google.oauth2 import service_account
 import gspread
@@ -6,7 +5,6 @@ from googleapiclient.discovery import build
 from datetime import datetime
 from app.app_error import AppError
 
-# Create credentials_info dictionary from environment variables
 credentials_info = {
     "type": os.getenv('TYPE'),
     "project_id": os.getenv('PROJECT_ID'),
@@ -41,24 +39,12 @@ def add_to_google_sheet(data):
 
     worksheet = sh.sheet1
 
-    email = data.get('email')
-    existing_rows = worksheet.get_all_records()
-    
-    row_to_delete = None
-    for index, row in enumerate(existing_rows):
-        if row['Email'].strip().lower() == email.strip().lower():
-            row_to_delete = index + 2  
-            break
-
-    if row_to_delete:
-        worksheet.delete_rows(row_to_delete)
-
     current_date = datetime.now().strftime('%d/%m/%Y')
 
     worksheet.append_row([
         data['name'], 
         data['phone'], 
-        data['department'], 
+        data['creci'], 
         current_date  
     ])
 

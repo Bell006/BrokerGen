@@ -5,14 +5,18 @@
 }
 
 body {
-  background: linear-gradient(to bottom right, #0b570d, #9aea4e); 
+  background: #511e60; 
+  padding: 20px;
 
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  min-height: 100vh;
+  overflow: auto;
 
-  height: 100vh;
-  width: 100vw;
+  transform: translateY(0);
+  transition: transform 0.5s ease-out;
 }
 
 .App {
@@ -20,79 +24,35 @@ body {
   color: white;
 }
 
-.app-wrapper {
-  width: 80vw;
+header {
+  display: flex;
+  gap: 15px;
+}
 
+header p {
+  color: #9aea4e;
+}
+
+form {
   display: grid;
-  grid-template-columns: 50% 50%;
-  grid-template-rows: 90% 10%;
-  gap: 5px;
-  grid-auto-flow: row;
-  grid-template-areas:
-    "h1 form"
-    "help help";
-  align-content: center;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+  gap: 20px;
+  max-width: 700px; 
+  padding: 20px 0; 
   align-items: center;
+}
+
+.inputWrapper.categories {
+  grid-column: 1 / -1;
 }
 
 .checkboxGroup {
   display: flex;
-  flex-direction: column;
-}
-
-.imageCard {
-  display: flex;
+  flex-wrap: wrap;
   gap: 10px;
-}
+  width: 100%;
 
-.imageLinks {
-  display: flex;
-  gap: 10px;
-}
-
-.checkboxGroup label input {
-  margin-right: 5px;
-  
-}
-
-h1 {
-  grid-area: h1;
-}
-
-.inputWrapper, form {
-  display: flex;
-  flex-direction: column;
-}
-
-form {
-  align-items: center;
-  grid-area: form;
-}
-
-.inputWrapper {
-  margin: 10px 0;
-  max-width: 187px;
-}
-
-.phoneWrapper {
-  display: flex;
-  gap: 4px;
-}
-
-.phoneWrapper button{
-  margin-top: 0;
-}
-
-.checkWrapper {
-  margin: 10px 0;
-}
-
-.checkWrapper label{
-  font-size: 14px;
-}
-
-label {
-  margin-bottom: 5px;
+  margin-top: 8px;
 }
 
 input, select {
@@ -104,35 +64,164 @@ input, select {
 button {
   margin-top: 20px;
   padding: 10px 20px;
-  color: rgb(3, 73, 30);
+  color: #cef146;
   font-weight: bold;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+
+  grid-column: 1 / -1;
+  height: 100%;
 }
 
 .createButton {
   background-color: #9aea4e;
-}
-
-.help {
-  grid-area: help;
-}
-
-
-.downloadButton:hover {
-  color: rgb(201, 8, 8);
+  color: #511e60;
 }
 
 .createButton:hover {
-  background-color: #80cc39;
+  background-color: #8fdd46;
 }
 
 .phoneWrapper button:hover{
   background-color: #e6e6e6;
 }
 
+.checkboxGroup label {
+  background-color: white;
+  padding: 10px 15px; 
+  border-radius: 8px; 
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); 
+  display: flex;
+  align-items: center; 
+  gap: 8px; 
+  cursor: pointer; 
+  transition: all 0.3s ease; 
 
+  color: #511e60;
+}
 
+.checkboxGroup label:hover {
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); 
+  transform: translateY(-2px); 
+}
 
+.checkboxGroup input {
+  margin-right: 5px;
+}
+
+.resultsContainer {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+  
+  opacity: 0;
+  transform: translateY(20px); 
+  
+  animation: fadeInUp 0.5s ease-out forwards;
+  z-index: 1;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+
+  color: rgb(170, 170, 170);
+}
+
+.imagesContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.imageCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+
+  color: rgb(170, 170, 170);
+}
+
+.imageCard p {
+  flex: 1;
+  margin: 0;
+  font-weight: bold;
+  text-align: left; 
+}
+
+.imageLinks {
+  display: flex;
+  gap: 10px;
+
+  z-index: 2;
+}
+
+.downloadButton {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  background-color: #511e60;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.downloadButton:hover {
+  background-color: #381144;
+}
+
+.downloadButton svg {
+  margin-right: 5px;
+}
+
+.createButton:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px); 
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.resultsContainer:before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  animation: moveBodyUp 0.5s ease-out forwards;
+}
+
+@keyframes moveBodyUp {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes moveBodyDown {
+  0% {
+    transform: translateY(-20px); 
+  }
+  100% {
+    transform: translateY(0); 
+  }
+}

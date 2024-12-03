@@ -1,10 +1,12 @@
 import os
+import re
 from flask import request, jsonify, Flask
 from flask_cors import CORS
 from dotenv import load_dotenv
 
 from app.utils import format_phone_number, validate_name, generate_image
 from app.app_error import AppError
+from app.google_api import add_to_google_sheet
 
 ##Setting application
 app = Flask(__name__)
@@ -19,7 +21,6 @@ google_drive_folder_id = os.getenv('GOOGLE_DRIVE_FOLDER_ID')
 
 def create_broker_images():
     try:
-
         data = request.get_json()
 
         phone = data.get('phone', '')
@@ -29,6 +30,9 @@ def create_broker_images():
 
         if not name or not phone or not creci:
            raise AppError('Preencha todos os campos.', 400)
+        
+        if len(creci) != 5 or not re.match(r'^\d{5}$', creci):
+            raise AppError('Insira um código CRECI válido (5 dígitos numéricos).', 400)
         
         # Format the phone number
         formatted_phone = format_phone_number(phone)
@@ -74,10 +78,11 @@ def create_broker_images():
                 'stories_image_url': stories_link
             })
 
+        add_to_google_sheet(data)    
+
         # Return the generated image URLs
         return jsonify({'generated_images': generated_images}), 200
 
-    
     except AppError as e:
         print(e)
         return jsonify({'message': e.message}), e.status_code

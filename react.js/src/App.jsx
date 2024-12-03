@@ -3,6 +3,7 @@ import InputMask from "react-input-mask";
 import { FaDownload } from "react-icons/fa6";
 import './App.css';
 import { api } from './services/api';
+import logo from './assets/Cidade-Buriti_logo.png';
 
 function App() {
   const [formData, setFormData] = useState({
@@ -88,34 +89,37 @@ function App() {
   return (
     <div className="App">
       <div className="app-wrapper">
-
-        <h1>Gerador de peças - Corretores</h1>
+        <header>
+          <img src={logo} alt="Logo" width="120"/>
+          <div className="headerWrapper">
+            <h1>Gerador de peças</h1>
+            <p>Corretores</p>
+          </div>
+        </header>
         <form onSubmit={handleSubmit}>
-
           <div className="inputWrapper">
             <label>
               Nome e sobrenome:
             </label>
-            <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder='Ex: Maria da Silva' required />
+            <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder='Maria da Silva' required />
           </div>
 
           <div className="inputWrapper">
             <label>
               Celular:
             </label>
-              <InputMask type='text' name='phone' value={formData.phone} onChange={handleChange} mask={mobileMask} required/>
+              <InputMask type='text' name='phone' value={formData.phone} onChange={handleChange} mask={mobileMask} placeholder='(64) 9 5647-7582' required/>
           </div>
 
           <div className="inputWrapper">
             <label>
               CRECI:
             </label>
-            <input type="number" name="creci" value={formData.creci} onChange={handleChange} placeholder='Ex: 99999' required />
+            <input type="number" name="creci" value={formData.creci} onChange={handleChange} placeholder='45287' required />
           </div>
 
-
-          <div className="inputWrapper">
-            <label>Categorias:</label>
+          <div className="inputWrapper categories">
+            <label className='categoriesTitle'>Categorias:</label>
             <div className="checkboxGroup">
               {categories.map(category => (
                 <label key={category.value}>
@@ -135,40 +139,39 @@ function App() {
             {loading ? 'Aguarde...' : 'Gerar peças'}
           </button>
         </form>
-
-        {generatedImages.length > 0 && (
-          <div className="results">
-            <h2>Imagens Geradas</h2>
-            <div className="imagesContainer">
-              {generatedImages.map((image, index) => (
-                <div key={index} className="imageCard">
-                  <h3>{image.category}</h3>
-                  <div className="imageLinks">
-                    <a
-                      href={image.feed_image_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="downloadButton"
-                    >
-                      <FaDownload /> Feed 
-                    </a>
-                    <a
-                      href={image.stories_image_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="downloadButton"
-                    >
-                      <FaDownload /> Stories
-                    </a>
+        
+          {generatedImages.length > 0 && (
+            <div className="resultsContainer">
+              <h2>Imagens Geradas</h2>
+              <div className="imagesContainer">
+                {generatedImages.map((image, index) => (
+                  <div key={index} className="imageCard">
+                    <p>{image.category}</p>
+                    <div className="imageLinks">
+                      <a
+                        href={image.feed_image_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="downloadButton"
+                      >
+                        <FaDownload /> Feed 
+                      </a>
+                      <a
+                        href={image.stories_image_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="downloadButton"
+                      >
+                        <FaDownload /> Stories
+                      </a>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        )}
-
+          )}
+        </div>
       </div>
-    </div>
   );
 }
 
