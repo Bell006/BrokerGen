@@ -25,14 +25,14 @@ def create_broker_images():
 
         phone = data.get('phone', '')
         name = data.get('name', '').upper()
-        creci = data.get('creci', '').upper()
+        creci = data.get('creci', '')
         categories = data.get('categories', [])
 
         if not name or not phone or not creci:
            raise AppError('Preencha todos os campos.', 400)
         
-        if len(creci) != 5 or not re.match(r'^\d{5}$', creci):
-            raise AppError('Insira um código CRECI válido (5 dígitos numéricos).', 400)
+        if len(creci) < 4 or len(creci) > 5 or not creci.isdigit():
+            raise AppError('Insira um código CRECI válido (4 a 5 dígitos numéricos).', 400)
         
         # Format the phone number
         formatted_phone = format_phone_number(phone)
