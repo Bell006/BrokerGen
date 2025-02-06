@@ -4,9 +4,9 @@ from flask import request, jsonify, Flask
 from flask_cors import CORS
 from dotenv import load_dotenv
 
-from app.utils.utils_files import generate_image, clean_up_temp_folder
-from app.utils.utils_format import format_phone_number, validate_name
-from app.utils.utils_google_api import add_to_google_sheet
+from app.utils.utils_files import FileManager
+from app.utils.utils_format import UserInputValidator
+from app.utils.utils_google_api import GoogleAPI
 from app.app_error import AppError
 
 ##Setting application
@@ -15,6 +15,9 @@ CORS(app)
 
 load_dotenv()
 google_drive_folder_id = os.getenv('GOOGLE_DRIVE_FOLDER_ID')
+
+google_api = GoogleAPI()
+fileManager = FileManager()
     
 @app.errorhandler(AppError)
 
@@ -36,10 +39,10 @@ def create_broker_images():
             raise AppError('Insira um código CRECI válido (4 a 5 dígitos numéricos).', 400)
         
         # Format the phone number
-        formatted_phone = format_phone_number(phone)
+        formatted_phone = UserInputValidator.format_phone_number(phone)
 
         # Validates name
-        validate_name(name)
+        UserInputValidator.validate_name(name)
         
         box_position_feed_general = (150, 1025)
         box_position_stories_general = (312, 1615)
@@ -123,8 +126,8 @@ def create_broker_images():
             category_data = category_mapping.get(category)
 
             if category_data:
-                feed_link = generate_image(category_data['feed'], folder_id, name, formatted_phone, creci, category_data['box_position_feed'])
-                stories_link = generate_image(category_data['stories'], folder_id, name, formatted_phone, creci, category_data['box_position_stories'])
+                feed_link = fileManager.generate_image(category_data['feed'], folder_id, name, formatted_phone, creci, category_data['box_position_feed'])
+                stories_link = fileManager.generate_image(category_data['stories'], folder_id, name, formatted_phone, creci, category_data['box_position_stories'])
 
             generated_images.append({
                 'category': category,
@@ -132,8 +135,8 @@ def create_broker_images():
                 'stories_image_url': stories_link
             })
 
-        add_to_google_sheet(data)
-        clean_up_temp_folder() 
+        google_api.add_to_google_sheet(data)
+        fileManager.clean_up_temp_folder() 
         
         # Return the generated image URLs
         return jsonify({'generated_images': generated_images}), 200

@@ -4,112 +4,106 @@ import gspread
 from googleapiclient.discovery import build
 from datetime import datetime
 from io import BytesIO
-from googleapiclient.http import MediaFileUpload
-from googleapiclient.http import MediaIoBaseDownload
+from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 
 from app.app_error import AppError
 
-credentials_info = {
-    "type": os.getenv('TYPE'),
-    "project_id": os.getenv('PROJECT_ID'),
-    "private_key_id": os.getenv('PRIVATE_KEY_ID'),
-    "private_key": os.getenv('PRIVATE_KEY'),
-    "client_email": os.getenv('CLIENT_EMAIL'),
-    "client_id": os.getenv('CLIENT_ID'),
-    "auth_uri": os.getenv('AUTH_URI'),
-    "token_uri": os.getenv('TOKEN_URI'),
-    "auth_provider_x509_cert_url": os.getenv('AUTH_PROVIDER_X509_CERT_URL'),
-    "client_x509_cert_url": os.getenv('CLIENT_X509_CERT_URL'),
-    "universe_domain": "googleapis.com"
-}
+class GoogleAPI:
+    def __init__(self):
+        self.credentials_info = {
+            "type": os.getenv('TYPE'),
+            "project_id": os.getenv('PROJECT_ID'),
+            "private_key_id": os.getenv('PRIVATE_KEY_ID'),
+            "private_key": os.getenv('PRIVATE_KEY'),
+            "client_email": os.getenv('CLIENT_EMAIL'),
+            "client_id": os.getenv('CLIENT_ID'),
+            "auth_uri": os.getenv('AUTH_URI'),
+            "token_uri": os.getenv('TOKEN_URI'),
+            "auth_provider_x509_cert_url": os.getenv('AUTH_PROVIDER_X509_CERT_URL'),
+            "client_x509_cert_url": os.getenv('CLIENT_X509_CERT_URL'),
+            "universe_domain": "googleapis.com"
+        }
 
-credentials = service_account.Credentials.from_service_account_info(credentials_info)
-drive_service = build('drive', 'v3', credentials=credentials)
+        self.credentials = service_account.Credentials.from_service_account_info(self.credentials_info)
+        self.drive_service = build('drive', 'v3', credentials=self.credentials)
 
-def get_google_sheets_service():
-    try:
-        scopes = ['https://www.googleapis.com/auth/spreadsheets']
-        credentials = service_account.Credentials.from_service_account_info(credentials_info, scopes=scopes)
-        gc = gspread.authorize(credentials)
+    def get_google_sheets_service(self):
+        try:
+            scopes = ['https://www.googleapis.com/auth/spreadsheets']
+            credentials = service_account.Credentials.from_service_account_info(self.credentials_info, scopes=scopes)
+            gc = gspread.authorize(credentials)
+            
+            return gc
+        except Exception as e:
+            print(f"Erro ao autorizar Google Sheets: {e}")
+            raise AppError("Erro ao conectar com Google Sheets", 500)
+
+    def add_to_google_sheet(self, data):
+        gc = self.get_google_sheets_service()
+
+        # Abrir a planilha pelo ID ou nome
+        spreadsheet_id = os.getenv('GOOGLE_SHEET_ID')
+        sh = gc.open_by_key(spreadsheet_id)
+
+        worksheet = sh.sheet1
+
+        current_date = datetime.now().strftime('%d/%m/%Y')
+
+        worksheet.append_row([
+            data['name'], 
+            data['phone'], 
+            data['creci'], 
+            current_date  
+        ])
+
+    def get_file_id_by_name(self, file_name, folder_id):
+        query = f"name='{file_name}.jpg' and '{folder_id}' in parents"
+        results = self.drive_service.files().list(q=query, spaces="drive", fields="files(id, name)").execute()
+        items = results.get('files', [])
         
-        return gc
-    except Exception as e:
-        print(f"Erro ao autorizar Google Sheets: {e}")
-        raise AppError("Erro ao conectar com Google Sheets", 500)
+        if not items:
+            raise AppError(f"O arquivo '{file_name}' não foi encontrado na pasta no Google Drive.", 400)
+        return items[0]['id']
 
-def add_to_google_sheet(data):
-    gc = get_google_sheets_service()
+    def download_template_from_drive(self, file_name, folder_id):
+        try:
+            file_id = self.get_file_id_by_name(file_name, folder_id)
+            request = self.drive_service.files().get_media(fileId=file_id)
 
-    # Abrir a planilha pelo ID ou nome
-    spreadsheet_id = os.getenv('GOOGLE_SHEET_ID')
-    sh = gc.open_by_key(spreadsheet_id)
+            # Temporary file path
+            root_path = os.path.dirname(os.path.abspath(__file__))
+            temp_dir = os.path.abspath(os.path.join(root_path, '..', '..', 'temp'))
+            
+            temp_file_path = os.path.join(temp_dir, file_name)
 
-    worksheet = sh.sheet1
+            fh = BytesIO()
+            downloader = MediaIoBaseDownload(fd=fh, request=request)
+            done = False
+            
+            while not done:
+                status, done = downloader.next_chunk()
 
-    current_date = datetime.now().strftime('%d/%m/%Y')
+            # Save the file to the temporary path
+            with open(temp_file_path, 'wb') as f:
+                f.write(fh.getvalue())
+            return temp_file_path
 
-    worksheet.append_row([
-        data['name'], 
-        data['phone'], 
-        data['creci'], 
-        current_date  
-    ])
+        except Exception as e:
+            print(e)
+            raise AppError(f"Erro ao gerar peças.", 500)
 
-def get_file_id_by_name(file_name, folder_id):
-    query = f"name='{file_name}.jpg' and '{folder_id}' in parents"
-    results = drive_service.files().list(q=query, spaces="drive", fields="files(id, name)").execute()
-    items = results.get('files', [])
-    
-    if not items:
-        raise AppError(f"O arquivo '{file_name}' não foi encontrado na pasta no Google Drive.", 400)
-    return items[0]['id']
+    def upload_and_get_link(self, output_temp_path, output_filename, google_drive_folder_id, template_path):
+        # Upload to Google Drive
+        file_metadata = {
+            'name': output_filename,
+            'parents': [google_drive_folder_id],
+        }
+        media = MediaFileUpload(output_temp_path, mimetype='image/jpeg', resumable=True)
+        uploaded_file = self.drive_service.files().create(body=file_metadata, media_body=media, fields='id').execute()
 
-def download_template_from_drive(file_name, folder_id):
+        # Get link
+        file_id = uploaded_file.get('id')
+        file = self.drive_service.files().get(fileId=file_id, fields='webContentLink').execute()
+        file_link = file.get('webContentLink')
 
-    print(f"Baixando template {file_name} da pasta {folder_id}")
-
-    try:
-        file_id = get_file_id_by_name(file_name, folder_id)
-        request = drive_service.files().get_media(fileId=file_id)
-
-        # Temporary file path
-        root_path = os.path.dirname(os.path.abspath(__file__))
-        temp_dir = os.path.abspath(os.path.join(root_path, '..', '..', 'temp'))
-        print(f"Temp directory: {temp_dir}")
-        
-        temp_file_path = os.path.join(temp_dir, file_name)
-        print(f"Saving file to: {temp_file_path}")
-
-        fh = BytesIO()
-        downloader = MediaIoBaseDownload(fd=fh, request=request)
-        done = False
-        
-        while not done:
-            status, done = downloader.next_chunk()
-            print(f"Download {int(status.progress() * 100)}%.")
-
-        # Save the file to the temporary path
-        with open(temp_file_path, 'wb') as f:
-            f.write(fh.getvalue())
-        return temp_file_path
-
-    except Exception as e:
-        print(e)
-        raise AppError(f"Erro ao gerar peças.", 500)
-
-def upload_and_get_link(output_temp_path, output_filename, google_drive_folder_id, template_path):
-    # Upload to Google Drive
-    file_metadata = {
-        'name': output_filename,
-        'parents': [google_drive_folder_id],
-    }
-    media = MediaFileUpload(output_temp_path, mimetype='image/jpeg', resumable=True)
-    uploaded_file = drive_service.files().create(body=file_metadata, media_body=media, fields='id').execute()
-
-    # Get link
-    file_id = uploaded_file.get('id')
-    file = drive_service.files().get(fileId=file_id, fields='webContentLink').execute()
-    file_link = file.get('webContentLink')
-
-    return file_link
-
+        return file_link

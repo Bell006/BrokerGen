@@ -1,6 +1,6 @@
 Flask
 gspread
-Flask-CORS
+Flask-Cors
 Pillow
 python-dotenv
 google-auth
