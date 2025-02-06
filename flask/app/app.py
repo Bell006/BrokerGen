@@ -4,9 +4,10 @@ from flask import request, jsonify, Flask
 from flask_cors import CORS
 from dotenv import load_dotenv
 
-from app.utils import format_phone_number, validate_name, generate_image
+from app.utils.utils_files import generate_image, clean_up_temp_folder
+from app.utils.utils_format import format_phone_number, validate_name
+from app.utils.utils_google_api import add_to_google_sheet
 from app.app_error import AppError
-from app.google_api import add_to_google_sheet
 
 ##Setting application
 app = Flask(__name__)
@@ -40,8 +41,8 @@ def create_broker_images():
         # Validates name
         validate_name(name)
         
-        box_position_feed = (150, 1025)
-        box_position_stories = (312, 1615)
+        box_position_feed_general = (150, 1025)
+        box_position_stories_general = (312, 1615)
 
         box_position_stories_condicoes = (120, 1560)
         box_position_feed_condicoes1 = (718, 955)
@@ -49,26 +50,81 @@ def create_broker_images():
 
         box_position_feed_else = (745, 1025)
 
+        folder_id = '1i_d5Ae4vdbybYSzvZI4jUw8QM7RgvjcG'
+        category_mapping = {
+            'condicoes1': {
+                'feed': 'peça_condicoes1_feed',
+                'stories': 'peça_condicoes1_stories',
+                'box_position_feed': box_position_feed_condicoes1,
+                'box_position_stories':  box_position_stories_condicoes
+            },
+            'condicoes2': {
+                'feed': 'peça_condicoes2_feed',
+                'stories': 'peça_condicoes2_stories',
+                'box_position_feed': box_position_feed_condicoes2,
+                'box_position_stories': box_position_stories_condicoes
+            },
+            'investidor': {
+                'feed': 'peça_investidor_feed',
+                'stories': 'peça_investidor_stories',
+                'box_position_feed': box_position_feed_general,
+                'box_position_stories': box_position_stories_general
+            },
+            'localizacao': {
+                'feed': 'peça_localizacao_feed',
+                'stories': 'peça_localizacao_stories',
+                'box_position_feed': box_position_feed_else,
+                'box_position_stories': box_position_stories_general
+            },
+            'petplace': {
+                'feed': 'peça_petplace_feed',
+                'stories': 'peça_petplace_stories',
+                'box_position_feed': box_position_feed_else,
+                'box_position_stories': box_position_stories_general
+            },
+            'poliesportiva': {
+                'feed': 'peça_poliesportiva_feed',
+                'stories': 'peça_poliesportiva_stories',
+                'box_position_feed': box_position_feed_else,
+                'box_position_stories': box_position_stories_general
+            },
+            'general': {
+                'feed': 'peça_general_feed',
+                'stories': 'peça_general_stories',
+                'box_position_feed': box_position_feed_general,
+                'box_position_stories': box_position_stories_general
+            },
+            'playground': {
+                'feed': 'peça_playground_feed',
+                'stories': 'peça_playground_stories',
+                'box_position_feed': box_position_feed_else,
+                'box_position_stories': box_position_stories_general
+            },
+            'quadraAreia': {
+                'feed': 'peça_quadraAreia_feed',
+                'stories': 'peça_quadraAreia_stories',
+                'box_position_feed': box_position_feed_else,
+                'box_position_stories': box_position_stories_general
+            },
+            'areaLazer': {
+                'feed': 'peça_areaLazer_feed',
+                'stories': 'peça_areaLazer_stories',
+                'box_position_feed': box_position_feed_else,
+                'box_position_stories': box_position_stories_general
+            }
+        }
+
         # List to hold links for all generated images
         generated_images = []
 
         # Generate images for each selected category
         for category in categories:
-            template_image_path_feed = os.path.join(app.root_path, 'static', 'assets', f'peça_{category}_feed.jpg')
-            template_image_path_stories = os.path.join(app.root_path, 'static', 'assets', f'peça_{category}_stories.jpg')
+            # Pegue os dados da categoria a partir do mapeamento
+            category_data = category_mapping.get(category)
 
-            if category == 'condicoes1':
-                feed_link = generate_image(template_image_path_feed, name, formatted_phone, creci, box_position_feed_condicoes1)
-                stories_link = generate_image(template_image_path_stories, name, formatted_phone, creci, box_position_stories_condicoes)
-            elif category == 'condicoes2':
-                feed_link = generate_image(template_image_path_feed, name, formatted_phone, creci, box_position_feed_condicoes2)
-                stories_link = generate_image(template_image_path_stories, name, formatted_phone, creci, box_position_stories_condicoes)
-            elif category == 'general' or category == 'investidor':
-                feed_link = generate_image(template_image_path_feed, name, formatted_phone, creci, box_position_feed)
-                stories_link = generate_image(template_image_path_stories, name, formatted_phone, creci, box_position_stories)
-            else:
-                feed_link = generate_image(template_image_path_feed, name, formatted_phone, creci, box_position_feed_else)
-                stories_link = generate_image(template_image_path_stories, name, formatted_phone, creci, box_position_stories)
+            if category_data:
+                feed_link = generate_image(category_data['feed'], folder_id, name, formatted_phone, creci, category_data['box_position_feed'])
+                stories_link = generate_image(category_data['stories'], folder_id, name, formatted_phone, creci, category_data['box_position_stories'])
 
             generated_images.append({
                 'category': category,
@@ -76,8 +132,9 @@ def create_broker_images():
                 'stories_image_url': stories_link
             })
 
-        add_to_google_sheet(data)    
-
+        add_to_google_sheet(data)
+        clean_up_temp_folder() 
+        
         # Return the generated image URLs
         return jsonify({'generated_images': generated_images}), 200
 
@@ -89,4 +146,4 @@ def create_broker_images():
         return jsonify({'message': 'Erro ao criar a peça. Por favor, tente novamente mais tarde.'}), 500
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)
