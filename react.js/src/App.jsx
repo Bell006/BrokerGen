@@ -12,7 +12,7 @@ function App() {
     creci: '',
     categories: []
   });
-
+  
   const [generatedImages, setGeneratedImages] = useState([]);
   const [loading, setLoading] = useState(false);
   
@@ -28,48 +28,52 @@ function App() {
     { value: 'quadraAreia', label: 'Quadra de areia' },
     { value: 'areaLazer', label: 'Área de lazer' },
   ];
-
-
+  
   let digit = /[0-9]/;
   let mobileMask = ['(', digit, digit, ')', ' ', '9', ' ', digit, digit, digit, digit, '-', digit, digit, digit, digit];
+  
+  const handleApiError = (error) => {
+    console.log('Error details:', error);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-  
-    if (type === "checkbox") {
-      setFormData(prevState => {
-        if (checked) {
-          if (prevState.categories.length >= 5) {
-            return prevState;
-          }
-  
-          return {
-            ...prevState,
-            categories: [...prevState.categories, value]
-          };
-        } else {
-          const updatedCategories = prevState.categories.filter(category => category !== value);
-          return {
-            ...prevState,
-            categories: updatedCategories
-          };
-        }
-      });
-  
-      if (checked && formData.categories.length >= 5) {
-        alert("Selecione no máximo 5 categorias por vez.");
-      }
+    if (error.response && error.response.data && error.response.data.message) {
+      alert(error.response.data.message);
+    } else if (error.request) {
+      alert('A requisição foi feita, mas não houve resposta. Verifique a configuração do servidor.');
     } else {
-      setFormData(prevState => ({
-        ...prevState,
-        [name]: value
-      }));
+      alert('Erro ao criar as imagens. Por favor, tente novamente mais tarde.');
     }
   };
+  
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    
+    if (type === 'checkbox') {
+      const updatedCategories = checked
+      ? formData.categories.includes(value) || formData.categories.length >= 5
+      ? formData.categories
+      : [...formData.categories, value]
+      : formData.categories.filter((category) => category !== value);
+      
+      setFormData({
+        ...formData,
+        categories: updatedCategories,
+      });
+      
+      if (checked && formData.categories.length >= 5) {
+        alert('Selecione no máximo 5 categorias por vez.');
+      }
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
+  };
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
+    
     try {
       setGeneratedImages([]);
 
@@ -85,14 +89,7 @@ function App() {
         alert(`${response.data.message}`);
       }
     } catch (error) {
-      console.log('Error details:', error);
-      if (error.response && error.response.data && error.response.data.message) {
-        alert(error.response.data.message);
-      } else if (error.request) {
-        alert('A requisição foi feita, mas não houve resposta. Verifique a configuração do servidor.');
-      } else {
-        alert('Erro ao criar as imagens. Por favor, tente novamente mais tarde.');
-      }
+      handleApiError(error);
     } finally {
       setLoading(false);
     }
@@ -188,3 +185,4 @@ function App() {
 }
 
 export default App;
+
