@@ -1,195 +1,46 @@
-* {
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
+:root {
+  --primary-purple: #511e60;
+  --accent-green: #9aea4e;
+  --light-green: #cef146;
+}
+
+@media (min-width: 992px) {
+  body {
+    background: linear-gradient(to right, var(--primary-purple) 50%, white 50%);
+  }
+
+  .container-fluid {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+  }
+  .images-container {
+    overflow-y: auto; /* Enable scrolling if content overflows */
+  }
+
+  .card-body-scrollable {
+    height: 50vh;
+    overflow-y: auto;
+  }
+
+  .row {
+    margin-right: 0;
+  }
 }
 
 body {
-  background: #511e60; 
-  padding: 20px;
-
+  background: var(--primary-purple);
+  font-family: "Poppins", sans-serif;
+  min-height: 100vh;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  overflow: auto;
-
-  transform: translateY(0);
-  transition: transform 0.5s ease-out;
-}
-
-.App {
-  font-family: "Poppins", sans-serif;
-  color: white;
-}
-
-header {
-  display: flex;
-  gap: 15px;
-}
-
-header p {
-  color: #9aea4e;
-}
-
-form {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-  gap: 20px;
-  max-width: 700px; 
-  padding: 20px 0; 
-  align-items: center;
-}
-
-.inputWrapper.categories {
-  grid-column: 1 / -1;
-}
-
-.checkboxGroup {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  width: 100%;
-
-  margin-top: 8px;
-}
-
-input, select {
-  padding: 8px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
-
-button {
-  margin-top: 20px;
-  padding: 10px 20px;
-  color: #cef146;
-  font-weight: bold;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-
-  grid-column: 1 / -1;
-  height: 100%;
-}
-
-.createButton {
-  background-color: #9aea4e;
-  color: #511e60;
-}
-
-.createButton:hover {
-  background-color: #8fdd46;
-}
-
-.phoneWrapper button:hover{
-  background-color: #e6e6e6;
-}
-
-.checkboxGroup label {
-  background-color: white;
-  padding: 10px 15px; 
-  border-radius: 8px; 
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); 
-  display: flex;
-  align-items: center; 
-  gap: 8px; 
-  cursor: pointer; 
-  transition: all 0.3s ease; 
-
-  color: #511e60;
-}
-
-.checkboxGroup label:hover {
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); 
-  transform: translateY(-2px); 
-}
-
-.checkboxGroup input {
-  margin-right: 5px;
-}
-
-.resultsContainer {
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  margin-top: 20px;
-  
-  opacity: 0;
-  transform: translateY(20px); 
-  
-  animation: fadeInUp 0.5s ease-out forwards;
-  z-index: 1;
-}
-
-h2 {
-  text-align: center;
-  margin-bottom: 20px;
-
-  color: rgb(170, 170, 170);
-}
-
-.imagesContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.imageCard {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-
-  color: rgb(170, 170, 170);
-}
-
-.imageCard p {
-  flex: 1;
-  margin: 0;
-  font-weight: bold;
-  text-align: left; 
-}
-
-.imageLinks {
-  display: flex;
-  gap: 10px;
-
-  z-index: 2;
-}
-
-.downloadButton {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  background-color: #511e60;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 5px;
-  font-size: 14px;
-}
-
-.downloadButton:hover {
-  background-color: #381144;
-}
-
-.downloadButton svg {
-  margin-right: 5px;
-}
-
-.createButton:disabled {
-  background-color: #aaa;
-  cursor: not-allowed;
 }
 
 @keyframes fadeInUp {
   0% {
     opacity: 0;
-    transform: translateY(20px); 
+    transform: translateY(20px);
   }
   100% {
     opacity: 1;
@@ -197,31 +48,108 @@ h2 {
   }
 }
 
-.resultsContainer:before {
-  content: "";
-  display: block;
+.subdivision-label {
+  color: white;
+}
+
+.results-card {
+  background-color: transparent;
+  border: dashed 1px var(--light-green);
+  border-radius: 10px;
+
+  p {
+    color: white;
+  }
+}
+
+/* Custom checkbox styling */
+.form-check-input:checked {
+  background-color: var(--accent-green);
+  border-color: var(--accent-green);
+}
+
+/* Custom button styling */
+.btn-primary {
+  background-color: var(--accent-green);
+  color: var(--primary-purple);
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: #8fdd46;
+  color: var(--primary-purple);
+}
+
+.categories .row {
+  margin-top: 0;
+  gap: 10px;
+}
+
+.form-check {
+  position: relative;
+  margin: 0;
+  padding-left: 0;
+}
+
+.form-check-input {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 100%;
-  animation: moveBodyUp 0.5s ease-out forwards;
+  opacity: 0;
+  width: 0;
+  height: 0;
 }
 
-@keyframes moveBodyUp {
-  0% {
-    transform: translateY(0);
-  }
-  100% {
-    transform: translateY(-20px);
-  }
+.form-check-label {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 12px;
+  border-radius: 12px;
+  display: block;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border: 1px solid #ddd;
+  width: 100%;
+  text-align: center;
+  font-size: 13px;
 }
 
-@keyframes moveBodyDown {
-  0% {
-    transform: translateY(-20px); 
-  }
-  100% {
-    transform: translateY(0); 
-  }
+.form-check-input:checked + .form-check-label {
+  background-color: var(--accent-green);
+  color: var(--primary-purple);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.form-check-label:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.btn-primary:disabled {
+  background-color: #6c757d; /* Bootstrap's gray color */
+  color: white;
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-outline-custom {
+  border-color: var(--primary-purple);
+  color: var(--primary-purple);
+  transition: all 0.3s ease;
+}
+
+.btn-outline-custom:hover {
+  background-color: var(--primary-purple);
+  color: var(--accent-green);
+}
+
+/* Disable input spinners */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
 }
