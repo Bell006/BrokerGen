@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
 import InputMask from "react-input-mask";
+import { useNavigate } from 'react-router';
 import { FaDownload } from "react-icons/fa6";
 import { api } from  '../../services/api';
 import logo from '../../assets/Cidade-Buriti_logo.png';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Dashboard.css';
+import { useAuth } from '../../contexts/AuthContext.jsx';
 import { Modal, Button } from 'react-bootstrap';
 import loadingIcon from '../../assets/loadingAn.svg';
 
 function Dashboard() {
+
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -19,6 +25,7 @@ function Dashboard() {
   const [generatedImages, setGeneratedImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [subDivisionSelected, setsubDivisionSelected] = useState("");
 
   const categories = [
     { value: 'investidor', label: 'Investidor' },
@@ -37,8 +44,8 @@ function Dashboard() {
   let mobileMask = ['(', digit, digit, ')', ' ', '9', ' ', digit, digit, digit, digit, '-', digit, digit, digit, digit];
 
   const handleLogout = () => {
-    localStorage.removeItem('broker');
-    window.location.href = '/login';
+    logout();
+    navigate('/login');
   };
 
   const handleApiError = (error) => {
@@ -132,11 +139,16 @@ function Dashboard() {
 
               <div>
                 <label className="subdivision-label mb-2 mt-4 ">Empreendimento:</label>
-                <select class="form-select" aria-label="Default select example">
-                    <option selected>Cidade Buriti</option>
-                    <option value="1">Cidade Buriti</option>
-                    <option value="2">Cidade Buriti</option>
-                    <option value="3">Cidade Buriti</option>
+                <select
+                  className="form-select"
+                  aria-label="Default select example"
+                  value={subDivisionSelected}
+                  onChange={(e) => setsubDivisionSelected(e.target.value)}
+                >
+                  <option value="" disabled>Selecione um empreendimento</option>
+                  <option value="1">Cidade Buriti</option>
+                  <option value="2">Cidade Buriti</option>
+                  <option value="3">Cidade Buriti</option>
                 </select>
               </div>
             </div>

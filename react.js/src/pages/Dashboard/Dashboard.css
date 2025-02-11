@@ -6,9 +6,17 @@
   min-height: 5vh;
 }
 
+.results-card {
+  margin-bottom: 12px;
+}
+
 @media (min-width: 992px) {
   .images-container {
     overflow-y: auto;
+  }
+
+  .results-card {
+    margin-bottom: 0;
   }
 
   .card-body-scrollable {

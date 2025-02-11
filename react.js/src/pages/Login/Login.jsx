@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
 import { api } from '../../services/api';
+import { useNavigate } from "react-router";
+import { useAuth } from '../../contexts/AuthContext.jsx';
 import './Login.css';
 
 function Login() {
+  let navigate = useNavigate();
+  const { login } = useAuth();
+
   const [loginData, setLoginData] = useState({
     email: '',
     creci: ''
@@ -24,12 +29,11 @@ function Login() {
 
     try {
       const response = await api.post('/login', loginData);
-
-      // Store user info in localStorage
-      localStorage.setItem('broker', JSON.stringify(response.data.broker));
       
-      // Force a full navigation
-      window.location.href = '/dashboard';
+      // Use context login method
+      login(response.data.broker);
+      
+      navigate('/dashboard');
 
     } catch (error) {
       console.error('Login error:', error);
