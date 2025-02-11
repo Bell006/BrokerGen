@@ -1,0 +1,51 @@
+.images-container {
+  overflow-y: auto;
+}
+
+.card-body-scrollable {
+  min-height: 5vh;
+}
+
+@media (min-width: 992px) {
+  .images-container {
+    overflow-y: auto;
+  }
+
+  .card-body-scrollable {
+    height: 50vh;
+    overflow-y: auto;
+  }
+
+  .row {
+    margin-right: 0;
+  }
+
+  .logo {
+    width: 100px;
+  }
+}
+
+
+.logo {
+  width: 90px;
+}
+
+.card-animated {
+  animation: fadeInUp 0.5s ease-in-out;
+}
+
+.categories .row {
+  margin-top: 0;
+  gap: 10px;
+}
+
+.btn-outline-custom {
+  border-color: var(--primary-purple);
+  color: var(--primary-purple);
+  transition: all 0.3s ease;
+}
+
+.btn-outline-custom:hover {
+  background-color: var(--primary-purple);
+  color: var(--accent-green);
+}

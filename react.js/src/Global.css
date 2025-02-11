@@ -1,0 +1,131 @@
+:root {
+  --primary-purple: #511e60;
+  --accent-green: #9aea4e;
+  --light-green: #cef146;
+}
+
+/* Global body styles */
+body {
+  background: var(--primary-purple);
+  font-family: "Poppins", sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Global media query for larger screens */
+@media (min-width: 992px) {
+  body {
+    background: var(--primary-purple);
+  }
+
+  .container-fluid {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+  }
+}
+
+/* Fade in animation */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Global form check styles */
+.form-check {
+  position: relative;
+  margin: 0;
+  padding-left: 0;
+}
+
+.form-check-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.form-check-input:checked {
+  background-color: var(--accent-green);
+  border-color: var(--accent-green);
+}
+
+/* Global button styles */
+.btn-primary {
+  background-color: var(--accent-green);
+  color: var(--primary-purple);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #8fdd46;
+  color: var(--primary-purple);
+}
+
+.btn-primary:disabled {
+  background-color: #6c757d;
+  color: white;
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Global form check label styles */
+.form-check-label {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 12px;
+  border-radius: 12px;
+  display: block;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border: 1px solid #ddd;
+  width: 100%;
+  text-align: center;
+  font-size: 13px;
+}
+
+.form-check-input:checked + .form-check-label {
+  background-color: var(--accent-green);
+  color: var(--primary-purple);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.form-check-label:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Disable input spinners */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* Utility classes */
+.subdivision-label {
+  color: white;
+}
+
+.results-card {
+  background-color: transparent;
+  border: dashed 1px var(--light-green);
+  border-radius: 10px;
+}
+
+.results-card p {
+  color: white;
+}
