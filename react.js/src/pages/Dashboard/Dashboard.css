@@ -20,21 +20,22 @@
   }
 
   .card-body-scrollable {
-    height: 50vh;
+    height: 35vh;
     overflow-y: auto;
   }
 
   .row {
     margin-right: 0;
+    align-items: center;
   }
 
-  .logo {
+  .robot_icon {
     width: 100px;
   }
 }
 
 
-.logo {
+.robot_icon {
   width: 90px;
 }
 
@@ -48,12 +49,12 @@
 }
 
 .btn-outline-custom {
-  border-color: var(--primary-purple);
-  color: var(--primary-purple);
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
   transition: all 0.3s ease;
 }
 
 .btn-outline-custom:hover {
-  background-color: var(--primary-purple);
-  color: var(--accent-green);
+  background-color: var(--primary-blue);
+  color: var(--light-green);
 }

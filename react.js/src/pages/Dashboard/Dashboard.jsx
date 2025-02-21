@@ -3,7 +3,7 @@ import InputMask from "react-input-mask";
 import { useNavigate } from 'react-router';
 import { FaDownload } from "react-icons/fa6";
 import { api } from  '../../services/api';
-import logo from '../../assets/Cidade-Buriti_logo.png';
+import robot_icon from '../../assets/robot_icon.svg';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Dashboard.css';
 import { useAuth } from '../../contexts/AuthContext.jsx';
@@ -123,7 +123,7 @@ function Dashboard() {
             <div className="header-container">
               <div className="top-container d-flex align-items-center justify-content-between">
                 <div className="logo-container d-flex align-items-center">
-                  <img src={logo} alt="Logo" className="logo me-3"/>
+                  <img src={robot_icon} alt="Robot outline icon" className="robot_icon me-3"/>
                   <div>
                     <h1 className="h3 mb-0" style={{color: '#ffffff'}}>Gerador de peças</h1>
                     <p className="mb-0" style={{color: '#cef146'}}>Corretores</p>
@@ -133,12 +133,27 @@ function Dashboard() {
                   className="btn btn-sm btn-danger" 
                   onClick={handleLogout}
                   >
-                  Logout
+                  Sair
                   </button>
               </div>
 
               <div>
-                <label className="subdivision-label mb-2 mt-4 ">Empreendimento:</label>
+                <label className="subdivision-label mb-2 mt-4 ">Cidade:</label>
+                <select
+                  className="form-select"
+                  aria-label="Default select example"
+                  value={subDivisionSelected}
+                  onChange={(e) => setsubDivisionSelected(e.target.value)}
+                >
+                  <option value="" disabled>Selecione uma cidade</option>
+                  <option value="1">Cidade Buriti</option>
+                  <option value="2">Cidade Buriti</option>
+                  <option value="3">Cidade Buriti</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="subdivision-label mb-2 mt-4">Empreendimento:</label>
                 <select
                   className="form-select"
                   aria-label="Default select example"
@@ -273,7 +288,7 @@ function Dashboard() {
                   className="btn btn-primary w-100"
                   disabled={loading}
                 >
-                  {loading ? 'Aguarde...' : <span className="fw-bold">Gerar peças</span>}
+                  {loading ? 'Aguarde...' : <span>Gerar peças</span>}
                 </button>
               </form>
             </div>
@@ -286,7 +301,7 @@ function Dashboard() {
           <Modal.Title>Confirmação</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Ao clicar em 'Entendi!', você concorda com o armazenamento das informações fornecidas para melhorias de navegação e análise de uso do site.
+          Ao prosseguir, você concorda com o armazenamento das informações fornecidas e autoriza o tratamento de seus dados, nos termos da Lei Geral de Proteção de Dados, com a finalidade única e exclusiva de contribuir para melhorias nos materiais publicitários da empresa.
         </Modal.Body>
         <Modal.Footer>
           <Button variant="danger" onClick={handleCloseModal}>
