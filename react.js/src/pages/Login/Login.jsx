@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-import { api } from '../../services/api';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router";
 import { useAuth } from '../../contexts/AuthContext.jsx';
+import { FaRegArrowAltCircleRight } from "react-icons/fa";
 import './Login.css';
 
 function Login() {
   let navigate = useNavigate();
   const { login } = useAuth();
 
+  const [error, setError] = useState('');
   const [loginData, setLoginData] = useState({
     email: '',
-    creci: ''
+    code_uau: ''
   });
 
-  const [error, setError] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -28,21 +28,22 @@ function Login() {
     setError('');
 
     try {
-      const response = await api.post('/login', loginData);
-      
-      // Use context login method
-      login(response.data.broker);
-      
-      navigate('/dashboard');
+        const result = await login(loginData);
 
+        if (result.broker) {
+            navigate('/dashboard');
+        } else {
+            setError(result.message || 'Falha ao fazer login');
+        }
     } catch (error) {
-      console.error('Login error:', error);
-      setError(error.response?.data?.message || 'Falha ao fazer login.');
+        console.error('Login Submission Error:', error);
+        setError(error.message);
     }
-  };
+};
 
   return (
-    <div className="login-container gap-4">
+    <>
+      <div className="login-container gap-4">
       <div className="login-card">
         <div className="login-header">
           <h1 className="login-title h3">Login</h1>
@@ -57,18 +58,18 @@ function Login() {
               name="email"
               value={loginData.email}
               onChange={handleChange}
-              placeholder='maria@exemplo.com'
+              placeholder='email@exemplo.com'
               required
             />
           </div>
 
           <div className="mb-3">
-            <label className="form-label">CRECI:</label>
+            <label className="form-label">Cód. UAU</label>
             <input
               type="text"
               className="form-control"
-              name="creci"
-              value={loginData.creci}
+              name="code_uau"
+              value={loginData.code_uau}
               onChange={handleChange}
               placeholder='45287'
               required
@@ -81,13 +82,24 @@ function Login() {
           >
             Entrar
           </button>
+
+          <div className="signUp text-center d-flex flex-column align-items-center justify-content-center">
+            <p className="text-muted small mb-0 mt-2">Não possui uma conta?</p>
+            <div className="siginUp_wrapper">
+              <a href="/signup" className="signUp-link small d-flex align-items-center gap-1"> 
+                Cadastre-se
+                <FaRegArrowAltCircleRight/>
+              </a>
+            </div>
+          </div>
         </form>
       </div>
-      {error &&
-          <div class="alert alert-danger" role="alert">
+    </div>
+    {error &&
+          <div className="alert alert-danger text-center m-4" role="alert">
             {error}
           </div>}
-    </div>
+    </> 
   );
 }
 

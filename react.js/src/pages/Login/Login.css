@@ -1,27 +1,28 @@
 .login-container {
-  background: var(--primary-purple);
-  height: 100vh;
+  background: var(--primary-blue);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  margin: 12px;
+
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+  border-radius: 20px;
 }
 
 .login-card {
   background-color: white;
-  border-radius: 15px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 30px 30px 20px 20px;
   max-width: 400px;
   width: 100%;
 }
 
 .login-header {
-  background-color: var(--primary-purple);
+  background-color: var(--primary-blue);
   color: white;
   text-align: center;
   padding: 20px;
-  border-top-left-radius: 15px;
-  border-top-right-radius: 15px;
+  border-radius: 20px 20px 0 0;
 }
 
 .login-title {
@@ -30,7 +31,7 @@
 }
 
 .login-subtitle {
-  color: var(--accent-green);
+  color: var(--light-green);
   font-size: 0.9rem;
   margin-bottom: 0;
 }
@@ -40,12 +41,17 @@
 }
 
 .login-form .form-label {
-  color: var(--primary-purple);
+  color: var(--primary-blue);
   font-weight: 600;
 }
 
 .login-form .form-control {
-  border-color: var(--primary-purple);
+  border-color: var(--primary-blue);
+}
+
+.signUp-link {
+  color: var(--accent-green);
+  text-decoration: none;
 }
 
 .login-form .form-control:focus {
@@ -56,4 +62,5 @@
 .login-error {
   color: #dc3545;
   margin-top: 10px;
+  max-width: 300px;
 }
