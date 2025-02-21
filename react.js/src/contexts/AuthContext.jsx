@@ -1,11 +1,13 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { api } from '../services/api';
 
 // Create the AuthContext
 export const AuthContext = createContext({
   isAuthenticated: false,
   broker: null,
-  login: () => {},
-  logout: () => {}
+  login: () => { },
+  signup: () => { },
+  logout: () => { }
 });
 
 // AuthProvider component
@@ -22,11 +24,59 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  // Get CSRF Token
+  const getCsrfToken = async () => {
+    const tokenResponse = await api.get('/csrf-token', { withCredentials: true });
+    return tokenResponse.data.csrf_token;
+  };
+
   // Login method
-  const login = (brokerData) => {
-    localStorage.setItem('broker', JSON.stringify(brokerData));
-    setIsAuthenticated(true);
-    setBroker(brokerData);
+  const login = async (brokerData) => {
+    try {
+      const csrfToken = getCsrfToken();
+      api.defaults.headers.common['X-CSRFToken'] = csrfToken;
+
+      const response = await api.post('/login', brokerData, {
+        headers: {
+          'X-CSRFToken': csrfToken,
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      });
+
+      localStorage.setItem('broker', JSON.stringify(response.data.broker));
+      setIsAuthenticated(true);
+      setBroker(response.data.broker);
+
+      return response.data;
+    } catch (error) {
+      throw new Error(
+          error.response?.data?.message || 
+          'Falha ao fazer login'
+      );
+    }
+  };
+
+  const signup = async (signupData) => {
+    try {
+      const csrfToken = getCsrfToken();
+      api.defaults.headers.common['X-CSRFToken'] = csrfToken;
+
+      const response = await api.post('/signup', signupData, {
+        headers: {
+          'X-CSRFToken': csrfToken,
+          'Content-Type': 'application/json'
+        },
+        withCredentials: true
+      });
+
+      return response.data;
+    } catch (error) {
+      throw new Error(
+          error.response?.data?.message || 
+          'Erro ao criar cadastro'
+      );
+    }
   };
 
   // Logout method
@@ -37,16 +87,16 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      isAuthenticated, 
-      broker, 
-      login, 
-      logout 
+    <AuthContext.Provider value={{
+      isAuthenticated,
+      broker,
+      login,
+      signup,
+      logout
     }}>
       {children}
     </AuthContext.Provider>
   );
 };
-
 
 export const useAuth = () => useContext(AuthContext);
