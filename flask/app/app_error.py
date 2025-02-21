@@ -4,8 +4,5 @@ class AppError(Exception):
         self.message = message
         self.status_code = status_code
 
-    def __str__(self):
-        return f"AppError: {self.message} (status: {self.status_code})"
-
     def print_error(self):
         print(str(self))

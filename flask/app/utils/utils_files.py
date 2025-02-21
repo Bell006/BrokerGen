@@ -1,5 +1,4 @@
 import os
-import shutil
 from PIL import Image, ImageDraw, ImageFont
 from dotenv import load_dotenv
 from app.utils.utils_google_api import GoogleAPI
@@ -40,9 +39,9 @@ class FileManager:
     
     def generate_image(self, file_name, folder_id, name, phone, creci, box_position):
         template_path = google_api.download_template_from_drive(file_name, folder_id)
+        
         if template_path is None:
-            print(f"Erro ao baixar o template '{file_name}'.")
-            return None
+            raise AppError(f"Erro ao baixar o template '{file_name}'.")
         
         with Image.open(template_path) as image:
             draw = ImageDraw.Draw(image)
