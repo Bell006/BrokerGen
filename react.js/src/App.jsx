@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext.jsx';
 import Login from './pages/Login/Login';
+import SignUp from './pages/SignUp/SignUp';
 import Dashboard from './pages/Dashboard/Dashboard';
 
 function App() {
@@ -12,6 +13,10 @@ function App() {
       <Route 
         path="/login" 
         element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />} 
+      />
+      <Route 
+        path="/signup" 
+        element={isAuthenticated ? <Navigate to="/dashboard" /> : <SignUp />} 
       />
       <Route 
         path="/dashboard" 
