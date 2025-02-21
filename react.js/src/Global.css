@@ -1,12 +1,12 @@
 :root {
-  --primary-purple: #511e60;
-  --accent-green: #9aea4e;
+  --primary-blue: #0d154f;
+  --accent-green: #709414;
   --light-green: #cef146;
 }
 
 /* Global body styles */
 body {
-  background: var(--primary-purple);
+  background: var(--primary-blue);
   font-family: "Poppins", sans-serif;
   min-height: 100vh;
   display: flex;
@@ -17,7 +17,7 @@ body {
 /* Global media query for larger screens */
 @media (min-width: 992px) {
   body {
-    background: var(--primary-purple);
+    background: var(--primary-blue);
   }
 
   .container-fluid {
@@ -61,14 +61,13 @@ body {
 /* Global button styles */
 .btn-primary {
   background-color: var(--accent-green);
-  color: var(--primary-purple);
+  color: white;
   border: none;
   transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
-  background-color: #8fdd46;
-  color: var(--primary-purple);
+  background-color: #466d23;
 }
 
 .btn-primary:disabled {
@@ -95,24 +94,13 @@ body {
 
 .form-check-input:checked + .form-check-label {
   background-color: var(--accent-green);
-  color: var(--primary-purple);
+  color: white;
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
 .form-check-label:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
-/* Disable input spinners */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-input[type=number] {
-  -moz-appearance: textfield;
 }
 
 /* Utility classes */
@@ -128,4 +116,39 @@ input[type=number] {
 
 .results-card p {
   color: white;
+}
+
+/* Disable input spinners */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* Chrome, Edge and Safari */
+*::-webkit-scrollbar {
+  height: 7px;
+  width: 4px;
+}
+
+*::-webkit-scrollbar-track {
+  border-radius: 5px;
+  background-color: var(--primary-blue);
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 6px;
+  background-color: var(--light-green);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--accent-green);
+}
+
+*::-webkit-scrollbar-thumb:active {
+  background-color: var(--accent-green);
 }
