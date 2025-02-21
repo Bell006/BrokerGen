@@ -3,3 +3,5 @@
 __pycache__/
 addBroker.py
 brokergen.db
+UAU_CODES_DATA.csv
+UAU_CODES_UPDATE.py
