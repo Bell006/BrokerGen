@@ -13,6 +13,11 @@ class FileManager:
     def __init__(self):
         root_path = os.path.dirname(os.path.abspath(__file__))
         self.temp_dir = os.path.abspath(os.path.join(root_path, '..', '..', 'temp'))
+        
+        # Create temp directory if it doesn't exist
+        if not os.path.exists(self.temp_dir):
+            os.makedirs(self.temp_dir)
+
         self.font_path_bold = os.path.join(root_path, '..', 'static', 'fonts', 'Lato-Bold.ttf')
         self.font_path_black = os.path.join(root_path, '..', 'static', 'fonts', 'Lato-Black.ttf')
     
