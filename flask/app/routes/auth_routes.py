@@ -18,7 +18,11 @@ auth_bp = Blueprint('auth', __name__)
 def get_csrf():
     token = generate_csrf()
     response = make_response(jsonify({'csrf_token': token}))
-    response.set_cookie('csrf_token', token, samesite='Lax', httponly=False)
+    response.set_cookie('csrf_token', 
+                       token,
+                       samesite='None', 
+                       secure=True,      
+                       httponly=True)
     
     return response
 

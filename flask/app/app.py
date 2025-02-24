@@ -29,8 +29,8 @@ def create_app():
         resources={r"/api/*": {
             "origins": ["http://localhost:5173", "https://buriticorretores.netlify.app"],
             "supports_credentials": True,
-            "expose_headers": ["x-csrftoken"],
-            "allow_headers": ["Content-Type", "x-csrftoken"]
+            "expose_headers": ["x-csrftoken", "X-CSRFToken"],
+            "allow_headers": ["Content-Type", "x-csrftoken", "X-CSRFToken"]
         }},
         supports_credentials=True
     )
