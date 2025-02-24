@@ -27,7 +27,7 @@ def create_app():
 
     CORS(app, 
         resources={r"/api/*": {
-            "origins": ["http://localhost:5173"],
+            "origins": ["http://localhost:5173", "https://buriticorretores.netlify.app"],
             "supports_credentials": True,
             "expose_headers": ["x-csrftoken"],
             "allow_headers": ["Content-Type", "x-csrftoken"]
@@ -48,4 +48,4 @@ def create_app():
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
