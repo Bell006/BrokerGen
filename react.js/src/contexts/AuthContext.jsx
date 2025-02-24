@@ -24,63 +24,37 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // Get CSRF Token
-  const getCsrfToken = async () => {
-    const tokenResponse = await api.get('/csrf-token', { withCredentials: true });
-    return tokenResponse.data.csrf_token;
-  };
-
   // Login method
   const login = async (brokerData) => {
     try {
-      const csrfToken = await getCsrfToken();
-      api.defaults.headers.common['X-CSRFToken'] = csrfToken;
-
-      const response = await api.post('/login', brokerData, {
-        headers: {
-          'X-CSRFToken': csrfToken,
-          'Content-Type': 'application/json'
-        },
-        withCredentials: true
-      });
-
-      localStorage.setItem('broker', JSON.stringify(response.data.broker));
-      setIsAuthenticated(true);
-      setBroker(response.data.broker);
-
-      return response.data;
+        const response = await api.post('/login', brokerData);
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('broker', JSON.stringify(response.data.broker));
+        setIsAuthenticated(true);
+        setBroker(response.data.broker);
+        return response.data;
     } catch (error) {
-      throw new Error(
-          error.response?.data?.message || 
-          'Falha ao fazer login'
-      );
+        throw new Error(error.response?.data?.message || 'Falha ao fazer login');
     }
   };
 
   const signup = async (signupData) => {
     try {
-      const csrfToken = await getCsrfToken();
-      api.defaults.headers.common['X-CSRFToken'] = csrfToken;
-
-      const response = await api.post('/signup', signupData, {
-        headers: {
-          'X-CSRFToken': csrfToken,
-          'Content-Type': 'application/json'
-        },
-        withCredentials: true
-      });
-
-      return response.data;
+        const response = await api.post('/signup', signupData);
+        localStorage.setItem('token', response.data.token);
+        return response.data;
     } catch (error) {
-      throw new Error(
-          error.response?.data?.message || 
-          'Erro ao criar cadastro'
-      );
+        console.log('Signup Error Details:', error.response?.data);
+        throw new Error(
+            error.response?.data?.message || 
+            'Erro ao criar cadastro'
+        );
     }
-  };
+};
 
   // Logout method
   const logout = () => {
+    localStorage.removeItem('token');
     localStorage.removeItem('broker');
     setIsAuthenticated(false);
     setBroker(null);

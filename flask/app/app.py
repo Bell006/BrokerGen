@@ -2,7 +2,6 @@ from flask import Flask, jsonify
 from app.app_error import AppError 
 from flask_cors import CORS
 from app.config import Config
-from flask_wtf.csrf import CSRFProtect
 from dotenv import load_dotenv
 import os
 from database import db, init_db
@@ -12,9 +11,9 @@ from app.routes.image_routes import image_bp
 load_dotenv()
 
 def create_app():
-    
     app = Flask(__name__)
     app.config.from_object(Config)
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
     @app.errorhandler(AppError)
     def handle_app_error(error):
@@ -22,17 +21,12 @@ def create_app():
         response.status_code = error.status_code
         return response
 
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-    csrf = CSRFProtect(app)
-
     CORS(app, 
         resources={r"/api/*": {
-            "origins": ["http://localhost:5173", "https://buriticorretores.netlify.app"],
-            "supports_credentials": True,
-            "expose_headers": ["x-csrftoken", "X-CSRFToken"],
-            "allow_headers": ["Content-Type", "x-csrftoken", "X-CSRFToken"]
-        }},
-        supports_credentials=True
+            "origins": ["https://buriticorretores.netlify.app", "http://localhost:5173"],
+            "allow_headers": ["Content-Type", "Authorization"],
+            "methods": ["GET", "POST", "OPTIONS"]
+        }}
     )
 
     # Initialize database
