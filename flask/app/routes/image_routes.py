@@ -3,6 +3,7 @@ import os
 from flask import request, jsonify
 from dotenv import load_dotenv
 
+from app.utils.auth import token_required
 from app.utils.utils_files import FileManager
 from app.utils.utils_format import UserInputValidator
 from app.utils.utils_google_api import GoogleAPI
@@ -17,7 +18,9 @@ image_bp = Blueprint('image', __name__)
 @image_bp.errorhandler(AppError)
 
 @image_bp.route('/create_image', methods=['POST'])
-def create_broker_images():
+
+@token_required
+def create_broker_images(current_broker):
     try:
         data = request.get_json()
 
@@ -116,7 +119,6 @@ def create_broker_images():
 
         # Generate images for each selected category
         for category in categories:
-            # Pegue os dados da categoria a partir do mapeamento
             category_data = category_mapping.get(category)
 
             if category_data:
