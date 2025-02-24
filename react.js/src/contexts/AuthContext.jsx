@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
   // Login method
   const login = async (brokerData) => {
     try {
-      const csrfToken = getCsrfToken();
+      const csrfToken = await getCsrfToken();
       api.defaults.headers.common['X-CSRFToken'] = csrfToken;
 
       const response = await api.post('/login', brokerData, {
@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }) => {
 
   const signup = async (signupData) => {
     try {
-      const csrfToken = getCsrfToken();
+      const csrfToken = await getCsrfToken();
       api.defaults.headers.common['X-CSRFToken'] = csrfToken;
 
       const response = await api.post('/signup', signupData, {
