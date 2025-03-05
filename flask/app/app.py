@@ -17,12 +17,14 @@ def create_app():
 
     if ENV == "production":
         app.config.from_object(ProductionConfig)
+        cors_origins = os.getenv("CORS_ORIGINS_PROD")
     else:
         app.config.from_object(DevelopmentConfig)
+        cors_origins = os.getenv("CORS_ORIGINS_DEV")
 
     CORS(app, 
         resources={r"/api/*": {
-            "origins": app.config.get("CORS_ORIGINS", "http://localhost:5173"),
+            "origins": cors_origins,
             "allow_headers": ["Content-Type", "Authorization"],
             "methods": ["GET", "POST", "OPTIONS"]
         }}
