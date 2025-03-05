@@ -1,7 +1,12 @@
 import axios from 'axios';
 
+const baseURL = import.meta.env.MODE === 'development'
+    ? import.meta.env.VITE_API_URL // Development
+    : import.meta.env.VITE_API_URL_PROD; // Production
+
+
 const api = axios.create({
-    baseURL: 'https://brokergen.onrender.com/api',
+    baseURL,
     headers: {
         'Content-Type': 'application/json'
     }
