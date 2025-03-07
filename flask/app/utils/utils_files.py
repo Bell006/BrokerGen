@@ -5,7 +5,7 @@ from app.utils.utils_google_api import GoogleAPI
 from app.app_error import AppError
 
 load_dotenv()
-google_drive_folder_id = os.getenv('GOOGLE_DRIVE_FOLDER_ID')
+google_drive_output_folder_id = os.getenv('GOOGLE_DRIVE_OUTPUT_FOLDER_ID')
 
 google_api = GoogleAPI()
 
@@ -80,4 +80,4 @@ class FileManager:
             output_temp_path = os.path.join(self.temp_dir, output_filename)
             image.save(output_temp_path, format='JPEG')
         
-        return google_api.upload_and_get_link(output_temp_path, output_filename, google_drive_folder_id, template_path)
+        return google_api.upload_and_get_link(output_temp_path, output_filename, google_drive_output_folder_id, template_path)

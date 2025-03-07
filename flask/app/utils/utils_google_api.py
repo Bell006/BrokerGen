@@ -92,11 +92,11 @@ class GoogleAPI:
             print(e)
             raise AppError(f"Erro ao gerar peças.", 500)
 
-    def upload_and_get_link(self, output_temp_path, output_filename, google_drive_folder_id, template_path):
+    def upload_and_get_link(self, output_temp_path, output_filename, google_drive_output_folder_id, template_path):
         # Upload to Google Drive
         file_metadata = {
             'name': output_filename,
-            'parents': [google_drive_folder_id],
+            'parents': [google_drive_output_folder_id],
         }
         media = MediaFileUpload(output_temp_path, mimetype='image/jpeg', resumable=True)
         uploaded_file = self.drive_service.files().create(body=file_metadata, media_body=media, fields='id').execute()
