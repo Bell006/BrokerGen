@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from "react-router";
 import { useAuth } from '../../contexts/AuthContext.jsx';
+import { Input } from '../../components/Input.jsx';
 import { FaRegArrowAltCircleRight } from "react-icons/fa";
 import './Login.css';
 
@@ -50,55 +51,50 @@ function Login() {
           <p className="login-subtitle">Corretores</p>
         </div>
         <form className="login-form" onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label className="form-label">Email:</label>
-            <input
-              type="email"
-              className="form-control"
-              name="email"
-              value={loginData.email}
-              onChange={handleChange}
-              placeholder='email@exemplo.com'
-              required
-            />
-          </div>
+        <Input
+          label="Email:"
+          type="email"
+          name="email"
+          value={loginData.email}
+          onChange={handleChange}
+          placeholder="email@exemplo.com"
+          required
+        />
 
-          <div className="mb-3">
-            <label className="form-label">Cód. UAU</label>
-            <input
-              type="text"
-              className="form-control"
-              name="code_uau"
-              value={loginData.code_uau}
-              onChange={handleChange}
-              placeholder='45287'
-              required
-            />
-          </div>
+        <Input
+          label="Cód. UAU"
+          type="text"
+          name="code_uau"
+          value={loginData.code_uau}
+          onChange={handleChange}
+          placeholder="45287"
+          required
+        />
 
-          <button
-            type="submit"
-            className="btn login-btn w-100"
-          >
-            Entrar
-          </button>
+        <button
+          type="submit"
+          className="btn login-btn w-100"
+        >
+          Entrar
+        </button>
 
-          <div className="signUp text-center d-flex flex-column align-items-center justify-content-center">
-            <p className="text-muted small mb-0 mt-2">Não possui uma conta?</p>
-            <div className="siginUp_wrapper">
-              <a href="/signup" className="signUp-link small d-flex align-items-center gap-1"> 
-                Cadastre-se
-                <FaRegArrowAltCircleRight/>
-              </a>
-            </div>
+        <div className="signUp text-center d-flex flex-column align-items-center justify-content-center">
+          <p className="text-muted small mb-0 mt-2">Não possui uma conta?</p>
+          <div className="siginUp_wrapper">
+            <a href="/signup" className="signUp-link small d-flex align-items-center gap-1"> 
+              Cadastre-se
+              <FaRegArrowAltCircleRight/>
+            </a>
           </div>
-        </form>
+        </div>
+      </form>
       </div>
     </div>
     {error &&
-          <div className="alert alert-danger text-center m-4" role="alert">
-            {error}
-          </div>}
+      <div className="alert alert-danger text-center m-4" role="alert">
+        {error}
+      </div>
+    }
     </> 
   );
 }
