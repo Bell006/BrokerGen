@@ -90,10 +90,11 @@ function Dashboard() {
 
     try {
       setGeneratedImages([]);
+      console.log(formData.categories);
       const response = await api.post('/create_image', formData, {
         headers: { 'Content-Type': 'application/json' }
       });
-
+  
       setGeneratedImages(response.data.generated_images || []);
     } catch (error) {
       handleApiError(error);

@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from flask_wtf.csrf import generate_csrf
-from flask import make_response
+import jwt
+import datetime
 from app.models import Broker
 from database import db
 from dotenv import load_dotenv
@@ -14,13 +14,13 @@ load_dotenv()
 
 auth_bp = Blueprint('auth', __name__)
 
-@auth_bp.route('/csrf-token', methods=['GET'])
-def get_csrf():
-    token = generate_csrf()
-    response = make_response(jsonify({'csrf_token': token}))
-    response.set_cookie('csrf_token', token, samesite='Lax', httponly=False)
-    
-    return response
+def generate_token(broker_id):
+    payload = {
+        'broker_id': broker_id,
+        'exp': datetime.datetime.now() + datetime.timedelta(days=1)
+    }
+    return jwt.encode(payload, os.getenv('SECRET_KEY'), algorithm='HS256')
+
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
@@ -36,7 +36,12 @@ def login():
     if not broker:
             raise AppError('Credenciais inválidas.', 401)
     
-    return jsonify({'message': 'Login successful', 'broker': broker.to_dict()}), 200
+    token = generate_token(broker.id)
+    return jsonify({
+        'message': 'Login successful',
+        'broker': broker.to_dict(),
+        'token': token
+    }), 200
 
 @auth_bp.route('/signup', methods=['POST'])
 def signup():
@@ -89,7 +94,12 @@ def signup():
         db.session.add(new_broker)
         db.session.commit()
         
-        return jsonify({'message': 'Cadastro realizado com sucesso.', 'broker': new_broker.to_dict()}), 201
+        token = generate_token(new_broker.id)
+        return jsonify({
+            'message': 'Cadastro realizado com sucesso.',
+            'broker': new_broker.to_dict(),
+            'token': token
+        }), 201
     except Exception as e:
         db.session.rollback()
         raise AppError(f'Erro ao cadastrar corretor: {str(e)}', 500)

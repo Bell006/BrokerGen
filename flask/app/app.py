@@ -1,45 +1,41 @@
 from flask import Flask, jsonify
-from app.app_error import AppError 
 from flask_cors import CORS
-from app.config import Config
-from flask_wtf.csrf import CSRFProtect
 from dotenv import load_dotenv
 import os
-from database import db, init_db
+
+from app.app_error import AppError
+from app.config import DevelopmentConfig, ProductionConfig
+from database import init_db
 from app.routes.auth_routes import auth_bp
 from app.routes.image_routes import image_bp
 
-load_dotenv()
-
 def create_app():
-    
+    load_dotenv()
+    ENV = os.getenv("FLASK_ENV", "development")
+
     app = Flask(__name__)
-    app.config.from_object(Config)
 
-    @app.errorhandler(AppError)
-    def handle_app_error(error):
-        response = jsonify({'message': str(error)})
-        response.status_code = error.status_code
-        return response
-
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-    csrf = CSRFProtect(app)
+    if ENV == "production":
+        app.config.from_object(ProductionConfig)
+        cors_origins = os.getenv("CORS_ORIGINS_PROD")
+    else:
+        app.config.from_object(DevelopmentConfig)
+        cors_origins = os.getenv("CORS_ORIGINS_DEV")
 
     CORS(app, 
         resources={r"/api/*": {
-            "origins": ["http://localhost:5173"],
-            "supports_credentials": True,
-            "expose_headers": ["x-csrftoken"],
-            "allow_headers": ["Content-Type", "x-csrftoken"]
-        }},
-        supports_credentials=True
+            "origins": cors_origins,
+            "allow_headers": ["Content-Type", "Authorization"],
+            "methods": ["GET", "POST", "OPTIONS"]
+        }}
     )
 
-    # Initialize database
-    db.init_app(app)
+    @app.errorhandler(AppError)
+    def handle_app_error(error):
+        return jsonify({'message': str(error)}), error.status_code
+
     init_db(app)
 
-    # Register blueprints
     app.register_blueprint(auth_bp, url_prefix='/api')
     app.register_blueprint(image_bp, url_prefix='/api')
 
@@ -47,5 +43,5 @@ def create_app():
 
 app = create_app()
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=(os.getenv("FLASK_ENV", "development") == "development"))

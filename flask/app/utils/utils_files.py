@@ -5,7 +5,7 @@ from app.utils.utils_google_api import GoogleAPI
 from app.app_error import AppError
 
 load_dotenv()
-google_drive_folder_id = os.getenv('GOOGLE_DRIVE_FOLDER_ID')
+google_drive_folder_id = os.getenv('GOOGLE_DRIVE_OUTPUT_FOLDER_ID')
 
 google_api = GoogleAPI()
 

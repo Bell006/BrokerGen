@@ -3,13 +3,14 @@ import os
 from flask import request, jsonify
 from dotenv import load_dotenv
 
+from app.utils.auth import token_required
 from app.utils.utils_files import FileManager
 from app.utils.utils_format import UserInputValidator
 from app.utils.utils_google_api import GoogleAPI
 from app.app_error import AppError
 
 load_dotenv()
-google_drive_folder_id = os.getenv('GOOGLE_DRIVE_FOLDER_ID')
+google_drive_template_folder_id = os.getenv('GOOGLE_DRIVE_TEMPLATE_FOLDER_ID')
 google_api = GoogleAPI()
 fileManager = FileManager()
 
@@ -17,7 +18,9 @@ image_bp = Blueprint('image', __name__)
 @image_bp.errorhandler(AppError)
 
 @image_bp.route('/create_image', methods=['POST'])
-def create_broker_images():
+
+@token_required
+def create_broker_images(current_broker):
     try:
         data = request.get_json()
 
@@ -47,7 +50,6 @@ def create_broker_images():
 
         box_position_feed_else = (745, 1025)
 
-        folder_id = '1i_d5Ae4vdbybYSzvZI4jUw8QM7RgvjcG'
         category_mapping = {
             'condicoes1': {
                 'feed': 'peça_condicoes1_feed',
@@ -116,12 +118,11 @@ def create_broker_images():
 
         # Generate images for each selected category
         for category in categories:
-            # Pegue os dados da categoria a partir do mapeamento
             category_data = category_mapping.get(category)
 
             if category_data:
-                feed_link = fileManager.generate_image(category_data['feed'], folder_id, name, formatted_phone, creci, category_data['box_position_feed'])
-                stories_link = fileManager.generate_image(category_data['stories'], folder_id, name, formatted_phone, creci, category_data['box_position_stories'])
+                feed_link = fileManager.generate_image(category_data['feed'], google_drive_template_folder_id, name, formatted_phone, creci, category_data['box_position_feed'])
+                stories_link = fileManager.generate_image(category_data['stories'], google_drive_template_folder_id, name, formatted_phone, creci, category_data['box_position_stories'])
 
             generated_images.append({
                 'category': category,
@@ -141,4 +142,3 @@ def create_broker_images():
     except Exception as e:
         print(e)
         return jsonify({'message': 'Erro ao criar a peça. Por favor, tente novamente mais tarde.'}), 500
-
