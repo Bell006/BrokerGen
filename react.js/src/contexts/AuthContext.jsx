@@ -17,40 +17,60 @@ export const AuthProvider = ({ children }) => {
 
   // Check authentication on initial load
   useEffect(() => {
-    const storedBroker = localStorage.getItem('broker');
-    if (storedBroker) {
-      setIsAuthenticated(true);
-      setBroker(JSON.parse(storedBroker));
-    }
+    const validateUser = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        logout();
+        return;
+      }
+
+      try {
+        await api.get('/validate-token', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        const storedBroker = localStorage.getItem('broker');
+        if (storedBroker) {
+          setIsAuthenticated(true);
+          setBroker(JSON.parse(storedBroker));
+        }
+      } catch (error) {
+        logout();
+      }
+    };
+
+    validateUser();
   }, []);
 
   // Login method
   const login = async (brokerData) => {
     try {
-        const response = await api.post('/login', brokerData);
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('broker', JSON.stringify(response.data.broker));
-        setIsAuthenticated(true);
-        setBroker(response.data.broker);
-        return response.data;
+      const response = await api.post('/login', brokerData);
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('broker', JSON.stringify(response.data.broker));
+      setIsAuthenticated(true);
+      setBroker(response.data.broker);
+      return response.data;
     } catch (error) {
-        throw new Error(error.response?.data?.message || 'Falha ao fazer login');
+      throw new Error(error.response?.data?.message || 'Falha ao fazer login');
     }
   };
 
   const signup = async (signupData) => {
     try {
-        const response = await api.post('/signup', signupData);
-        localStorage.setItem('token', response.data.token);
-        return response.data;
+      const response = await api.post('/signup', signupData);
+      localStorage.setItem('token', response.data.token);
+      return response.data;
     } catch (error) {
-        console.log('Signup Error Details:', error.response?.data);
-        throw new Error(
-            error.response?.data?.message || 
-            'Erro ao criar cadastro'
-        );
+      console.log('Signup Error Details:', error.response?.data);
+      throw new Error(
+        error.response?.data?.message ||
+        'Erro ao criar cadastro'
+      );
     }
-};
+  };
 
   // Logout method
   const logout = () => {
