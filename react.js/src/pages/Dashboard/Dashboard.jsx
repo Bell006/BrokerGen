@@ -22,7 +22,7 @@ function Dashboard() {
   const { logout } = useAuth();
 
   const { categories, enterprises } = data;
-  
+
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -36,6 +36,31 @@ function Dashboard() {
   const [showModal, setShowModal] = useState(false);
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedEnterprise, setSelectedEnterprise] = useState('');
+
+  const normalizeString = (str) => {
+    return str
+      .normalize('NFD') 
+      .replace(/[\u0300-\u036f]/g, '') 
+      .replace(/\/[A-Z]{2}/i, '')
+      .replace(/\s+/g, '')
+      .toLowerCase();
+  };
+
+  // Filtra as categorias do empreendimento selecionado
+  const availableCategories = selectedEnterprise
+    ? enterprises[selectedCity]?.find(enterprise => enterprise.id === parseInt(selectedEnterprise))?.categories || []
+    : [];
+
+  // Filtra as opções de cidade para o dropdown
+  const cityOptions = Object.keys(enterprises).map((city) => ({ value: city, label: city }));
+
+  // Filtra as opções de empreendimento para o dropdown
+  const enterpriseOptions = selectedCity
+    ? enterprises[selectedCity].map((enterprise) => ({
+      value: enterprise.id,
+      label: enterprise.name,
+    }))
+    : [];
 
   const handleLogout = () => {
     logout();
@@ -81,7 +106,18 @@ function Dashboard() {
       return;
     }
 
+    const selectedEnterpriseObj = enterprises[selectedCity]?.find(
+      (enterprise) => enterprise.id === parseInt(selectedEnterprise)
+    );
+    
+    const dataToSubmit = {
+      ...formData,
+      city: normalizeString(selectedCity),
+      enterprise: normalizeString(selectedEnterpriseObj?.name || '')
+    };
+
     setShowModal(true);
+    setFormData(dataToSubmit); 
   };
 
   const handleConfirmSubmit = async (e) => {
@@ -90,11 +126,11 @@ function Dashboard() {
 
     try {
       setGeneratedImages([]);
-      console.log(formData.categories);
+
       const response = await api.post('/create_image', formData, {
         headers: { 'Content-Type': 'application/json' }
       });
-  
+
       setGeneratedImages(response.data.generated_images || []);
     } catch (error) {
       handleApiError(error);
@@ -134,25 +170,18 @@ function Dashboard() {
 
               <Dropdown
                 label="Cidade:"
-                options={Object.keys(enterprises).map((city) => ({ value: city, label: city }))}
+                options={cityOptions}
                 value={selectedCity}
                 onChange={(e) => {
                   setSelectedCity(e.target.value);
-                  setSelectedEnterprise(''); // Reset the enterprise
+                  setSelectedEnterprise('');
                 }}
                 placeholder="Selecione uma cidade"
               />
 
               <Dropdown
                 label="Empreendimento:"
-                options={
-                  selectedCity
-                    ? enterprises[selectedCity].map((enterprise) => ({
-                      value: enterprise.id,
-                      label: enterprise.name,
-                    }))
-                    : []
-                }
+                options={enterpriseOptions}
                 value={selectedEnterprise}
                 onChange={(e) => setSelectedEnterprise(e.target.value)}
                 disabled={!selectedCity}
@@ -190,8 +219,8 @@ function Dashboard() {
 
         {/* Right Column (Form) */}
         <div className="col-12 col-lg-6">
-          <div className="card shadow">
-            <div className="card-body">
+          <div className="card shadow card_body_db">
+            <div className="card-body ">
               <form onSubmit={handleSubmit}>
                 <Input
                   label="Nome:"
@@ -225,21 +254,28 @@ function Dashboard() {
                   required
                 />
 
-                <div className="mb-3">
-                  <label className="form-label">Categorias:</label>
-                  <div className="row">
-                    {categories.map((category) => (
-                      <CategoryBtn
-                        key={category.value}
-                        id={`category-${category.value}`}
-                        value={category.value}
-                        checked={formData.categories.includes(category.value)}
-                        onChange={handleChange}
-                        label={category.label}
-                      />
-                    ))}
-                  </div>
-                </div>
+<div className="mb-3">
+  <label className="form-label">Categorias:</label>
+
+  {!selectedCity || !selectedEnterprise ? (
+    <p className="text-secondary mt-1 text-center py-2">Selecione uma cidade e um empreendimento</p>
+  ) : (
+    <div className="row">
+      {categories
+        .filter(category => availableCategories.includes(category.value))
+        .map((category) => (
+          <CategoryBtn
+            key={category.value}
+            id={`category-${category.value}`}
+            value={category.value}
+            checked={formData.categories.includes(category.value)}
+            onChange={handleChange}
+            label={category.label}
+          />
+        ))}
+    </div>
+  )}
+</div>
 
                 <button
                   type="submit"
