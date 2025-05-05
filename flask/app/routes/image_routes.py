@@ -28,6 +28,8 @@ def create_broker_images(current_broker):
         name = data.get('name', '').upper()
         creci = data.get('creci', '')
         categories = data.get('categories', [])
+        selected_city = data.get('city', '')
+        selected_enterprise = data.get('enterprise', '')
 
         if not name or not phone or not creci:
            raise AppError('Preencha todos os campos.', 400)
@@ -90,7 +92,7 @@ def create_broker_images(current_broker):
             'general': {
                 'feed': 'peça_general_feed',
                 'stories': 'peça_general_stories',
-                'box_position_feed': box_position_feed_general,
+                'box_position_feed': box_position_feed_else,
                 'box_position_stories': box_position_stories_general
             },
             'playground': {
@@ -121,13 +123,16 @@ def create_broker_images(current_broker):
             category_data = category_mapping.get(category)
 
             if category_data:
-                feed_link = fileManager.generate_image(category_data['feed'], google_drive_template_folder_id, name, formatted_phone, creci, category_data['box_position_feed'])
-                stories_link = fileManager.generate_image(category_data['stories'], google_drive_template_folder_id, name, formatted_phone, creci, category_data['box_position_stories'])
+                feed_template = f"{category_data['feed']}_{selected_city}_{selected_enterprise}"
+                ##stories_template = f"{category_data['stories']}_{selected_city}_{selected_enterprise}"
+
+                feed_link = fileManager.generate_image(feed_template , google_drive_template_folder_id, name, formatted_phone, creci, category_data['box_position_feed'])
+                ##stories_link = fileManager.generate_image(stories_template, google_drive_template_folder_id, name, formatted_phone, creci, category_data['box_position_stories'])
 
             generated_images.append({
                 'category': category,
                 'feed_image_url': feed_link,
-                'stories_image_url': stories_link
+                ##'stories_image_url': stories_link
             })
 
         google_api.add_to_google_sheet(data)
