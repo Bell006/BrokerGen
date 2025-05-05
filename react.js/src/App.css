@@ -1,6 +1,7 @@
 @media (min-width: 992px) {
   body {
     background: linear-gradient(to right, var(--primary-purple) 50%, white 50%);
+    width: 100%;
   }
 
   .container-fluid {

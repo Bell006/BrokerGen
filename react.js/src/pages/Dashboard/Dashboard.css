@@ -23,6 +23,11 @@
     align-items: center;
   }
 
+  .container-fluid {
+    min-width: 1000px;
+  }
+
+
   .card-body-scrollable {
     height: 35vh;
     overflow-y: auto;

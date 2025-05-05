@@ -15,6 +15,13 @@ body {
   justify-content: center;
 }
 
+.dashboard-wrapper {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
 /* Fade in animation */
 @keyframes fadeInUp {
   0% {
