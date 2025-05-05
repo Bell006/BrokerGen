@@ -6,6 +6,7 @@ from database import db
 from dotenv import load_dotenv
 import os
 
+from app.utils.auth import token_required
 from app.utils.utils_google_api import GoogleAPI
 from app.utils.utils_format import UserInputValidator
 from app.app_error import AppError
@@ -21,6 +22,13 @@ def generate_token(broker_id):
     }
     return jwt.encode(payload, os.getenv('SECRET_KEY'), algorithm='HS256')
 
+@auth_bp.route('/validate-token', methods=['GET', 'OPTIONS'])
+@token_required
+def validate_token(current_broker):
+    try:
+        return jsonify(message="Token válido", broker=current_broker.to_dict()), 200
+    except Exception as e:
+        return jsonify({'message': 'Erro ao validar o token.'}), 500
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
@@ -34,7 +42,7 @@ def login():
     broker = Broker.query.filter_by(email=email, uau=uau).first()
 
     if not broker:
-            raise AppError('Credenciais inválidas.', 401)
+        raise AppError('Credenciais inválidas.', 401)
     
     token = generate_token(broker.id)
     return jsonify({

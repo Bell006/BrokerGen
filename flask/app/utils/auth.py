@@ -8,15 +8,19 @@ def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         token = request.headers.get('Authorization')
+
+        if request.method == 'OPTIONS':
+            return '', 200
+        
         if not token:
-            return jsonify({'message': 'Token is missing'}), 401
+            return jsonify({'message': 'Token indisponível.'}), 401
         
         try:
             token = token.split(' ')[1]  # Remove 'Bearer ' prefix
             data = jwt.decode(token, os.getenv('SECRET_KEY'), algorithms=['HS256'])
             current_broker = Broker.query.get(data['broker_id'])
         except:
-            return jsonify({'message': 'Invalid token'}), 401
+            return jsonify({'message': 'Token inválido.'}), 401
 
         return f(current_broker, *args, **kwargs)
     

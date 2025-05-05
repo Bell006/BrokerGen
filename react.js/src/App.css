@@ -1,12 +1,7 @@
-:root {
-  --primary-purple: #511e60;
-  --accent-green: #9aea4e;
-  --light-green: #cef146;
-}
-
 @media (min-width: 992px) {
   body {
     background: linear-gradient(to right, var(--primary-purple) 50%, white 50%);
+    width: 100%;
   }
 
   .container-fluid {
@@ -14,142 +9,13 @@
     display: flex;
     align-items: center;
   }
+
   .images-container {
-    overflow-y: auto; /* Enable scrolling if content overflows */
+    overflow-y: auto;
   }
 
   .card-body-scrollable {
     height: 50vh;
     overflow-y: auto;
   }
-
-  .row {
-    margin-right: 0;
-  }
-}
-
-body {
-  background: var(--primary-purple);
-  font-family: "Poppins", sans-serif;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-@keyframes fadeInUp {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.subdivision-label {
-  color: white;
-}
-
-.results-card {
-  background-color: transparent;
-  border: dashed 1px var(--light-green);
-  border-radius: 10px;
-
-  p {
-    color: white;
-  }
-}
-
-/* Custom checkbox styling */
-.form-check-input:checked {
-  background-color: var(--accent-green);
-  border-color: var(--accent-green);
-}
-
-/* Custom button styling */
-.btn-primary {
-  background-color: var(--accent-green);
-  color: var(--primary-purple);
-  border: none;
-}
-
-.btn-primary:hover {
-  background-color: #8fdd46;
-  color: var(--primary-purple);
-}
-
-.categories .row {
-  margin-top: 0;
-  gap: 10px;
-}
-
-.form-check {
-  position: relative;
-  margin: 0;
-  padding-left: 0;
-}
-
-.form-check-input {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.form-check-label {
-  cursor: pointer;
-  transition: all 0.3s ease;
-  padding: 12px;
-  border-radius: 12px;
-  display: block;
-  background-color: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  border: 1px solid #ddd;
-  width: 100%;
-  text-align: center;
-  font-size: 13px;
-}
-
-.form-check-input:checked + .form-check-label {
-  background-color: var(--accent-green);
-  color: var(--primary-purple);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
-.form-check-label:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
-.btn-primary:disabled {
-  background-color: #6c757d; /* Bootstrap's gray color */
-  color: white;
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.btn-outline-custom {
-  border-color: var(--primary-purple);
-  color: var(--primary-purple);
-  transition: all 0.3s ease;
-}
-
-.btn-outline-custom:hover {
-  background-color: var(--primary-purple);
-  color: var(--accent-green);
-}
-
-/* Disable input spinners */
-/* Chrome, Safari, Edge, Opera */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-/* Firefox */
-input[type=number] {
-  -moz-appearance: textfield;
 }

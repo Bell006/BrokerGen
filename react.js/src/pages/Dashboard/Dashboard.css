@@ -7,54 +7,30 @@
 }
 
 .results-card {
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
-
-@media (min-width: 992px) {
-  .images-container {
-    overflow-y: auto;
-  }
-
-  .results-card {
-    margin-bottom: 0;
-  }
-
-  .card-body-scrollable {
-    height: 35vh;
-    overflow-y: auto;
-  }
-
-  .row {
-    margin-right: 0;
-    align-items: center;
-  }
-
-  .robot_icon {
-    width: 100px;
-  }
-}
-
 
 .robot_icon {
   width: 90px;
 }
 
-.card-animated {
-  animation: fadeInUp 0.5s ease-in-out;
-}
+@media (min-width: 992px) {
+  .robot_icon {
+    width: 100px;
+  }
 
-.categories .row {
-  margin-top: 0;
-  gap: 10px;
-}
+  .row {
+    align-items: center;
+  }
 
-.btn-outline-custom {
-  border-color: var(--primary-blue);
-  color: var(--primary-blue);
-  transition: all 0.3s ease;
-}
+  .container-fluid {
+    min-width: 1000px;
+  }
 
-.btn-outline-custom:hover {
-  background-color: var(--primary-blue);
-  color: var(--light-green);
+
+  .card-body-scrollable {
+    height: 35vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
 }

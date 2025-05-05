@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext.jsx';
-import './SignUp.css';
+import { Input } from '../../components/Input.jsx';
 import { FaRegArrowAltCircleRight } from 'react-icons/fa';
 import './SignUp.css';
 
@@ -32,17 +32,16 @@ function SignUp() {
       const result = await signup(signUpData);
 
       if (result.broker) {
-          alert(result.message || 'Cadastro realizado com sucesso');
-        
-          navigate('/login');
+        alert(result.message || 'Cadastro realizado com sucesso');
+        navigate('/login');
       } else {
-          setError(result.message || 'Erro ao criar cadastro');
+        setError(result.message || 'Erro ao criar cadastro');
       }
-  } catch (error) {
+    } catch (error) {
       console.error('Signup Submission Error:', error);
       setError(error.message || 'Erro ao criar cadastro');
-  }
-};
+    }
+  };
 
   return (
     <>
@@ -52,43 +51,33 @@ function SignUp() {
             <h2 className="login-title h3 mb-0">Criar Conta</h2>
           </div>
           <form className="login-form" onSubmit={handleSubmit}>
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-            <div className="mb-3">
-              <label className="form-label">Nome e sobrenome</label>
-              <input
-                type="text"
-                className="form-control"
-                name="name"
-                value={signUpData.name}
-                onChange={handleChange}
-                placeholder="Maria da Silva"
-                required
-              />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Email</label>
-              <input
-                type="email"
-                className="form-control"
-                name="email"
-                value={signUpData.email}
-                onChange={handleChange}
-                placeholder="corretor@exemplo.com"
-                required
-              />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Cód. UAU</label>
-              <input
-                type="text"
-                className="form-control"
-                name="code_uau"
-                value={signUpData.code_uau}
-                onChange={handleChange}
-                placeholder="45819"
-                required
-              />
-            </div>
+            <Input
+              label="Nome e sobrenome"
+              type="text"
+              name="name"
+              value={signUpData.name}
+              onChange={handleChange}
+              placeholder="Maria da Silva"
+              required
+            />
+            <Input
+              label="Email"
+              type="email"
+              name="email"
+              value={signUpData.email}
+              onChange={handleChange}
+              placeholder="corretor@exemplo.com"
+              required
+            />
+            <Input
+              label="Cód. UAU"
+              type="text"
+              name="code_uau"
+              value={signUpData.code_uau}
+              onChange={handleChange}
+              placeholder="45819"
+              required
+            />
             <button type="submit" className="btn btn-primary w-100">
               Cadastrar
             </button>

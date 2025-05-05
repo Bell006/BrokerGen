@@ -1,5 +1,6 @@
 :root {
   --primary-blue: #0d154f;
+  --primary-purple: #511e60;
   --accent-green: #709414;
   --light-green: #cef146;
 }
@@ -14,17 +15,11 @@ body {
   justify-content: center;
 }
 
-/* Global media query for larger screens */
-@media (min-width: 992px) {
-  body {
-    background: var(--primary-blue);
-  }
-
-  .container-fluid {
-    height: 100vh;
-    display: flex;
-    align-items: center;
-  }
+.dashboard-wrapper {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
 }
 
 /* Fade in animation */
@@ -37,25 +32,6 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-/* Global form check styles */
-.form-check {
-  position: relative;
-  margin: 0;
-  padding-left: 0;
-}
-
-.form-check-input {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.form-check-input:checked {
-  background-color: var(--accent-green);
-  border-color: var(--accent-green);
 }
 
 /* Global button styles */
@@ -77,7 +53,31 @@ body {
   cursor: not-allowed;
 }
 
-/* Global form check label styles */
+.btn-outline-custom {
+  border-color: var(--primary-blue);
+  color: var(--primary-blue);
+  transition: all 0.3s ease;
+}
+
+.btn-outline-custom:hover {
+  background-color: var(--primary-blue);
+  color: var(--light-green);
+}
+
+/* Global form styles */
+.form-check {
+  position: relative;
+  margin: 0;
+  padding-left: 0;
+}
+
+.form-check-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
 .form-check-label {
   cursor: pointer;
   transition: all 0.3s ease;
@@ -85,7 +85,7 @@ body {
   border-radius: 12px;
   display: block;
   background-color: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border: 1px solid #ddd;
   width: 100%;
   text-align: center;
@@ -95,17 +95,21 @@ body {
 .form-check-input:checked + .form-check-label {
   background-color: var(--accent-green);
   color: white;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .form-check-label:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Utility classes */
-.subdivision-label {
-  color: white;
+.overflow-y-auto {
+  overflow-y: auto;
+}
+
+.card-animated {
+  animation: fadeInUp 0.5s ease-in-out;
 }
 
 .results-card {
@@ -125,11 +129,11 @@ input::-webkit-inner-spin-button {
   margin: 0;
 }
 
-input[type=number] {
+input[type="number"] {
   -moz-appearance: textfield;
 }
 
-/* Chrome, Edge and Safari */
+/* Scrollbar styles */
 *::-webkit-scrollbar {
   height: 7px;
   width: 4px;

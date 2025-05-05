@@ -53,7 +53,7 @@ class FileManager:
             box_width, box_height, margin = 456, 127, 15
             
             name_font = self.adjust_font_size(name, box_width - 2 * margin, self.font_path_black)
-            creci_text = f"Creci: {creci.split('-')[-1]}-TO"
+            creci_text = f"Creci: {creci.split('-')[-1]}"
             creci_font = self.adjust_font_size(creci_text, box_width - 2 * margin, self.font_path_bold, 28)
             phone_font = self.adjust_font_size(phone, box_width - 2 * margin, self.font_path_black)
             
