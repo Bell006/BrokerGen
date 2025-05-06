@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Toast, showToast } from '../../components/Toast.jsx';
+import 'react-toastify/dist/ReactToastify.css';
+
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { Input } from '../../components/Input.jsx';
 import loadingIcon from '../../assets/loadingAn.svg';
@@ -7,11 +10,11 @@ import { FaRegArrowAltCircleRight } from 'react-icons/fa';
 import './SignUp.css';
 
 function SignUp() {
+
   const navigate = useNavigate();
   const { signup } = useAuth();
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [signUpData, setSignUpData] = useState({
     name: '',
     email: '',
@@ -28,7 +31,6 @@ function SignUp() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
 
     setLoading(true);
 
@@ -36,13 +38,16 @@ function SignUp() {
       const result = await signup(signUpData);
 
       if (result.broker) {
-        alert(result.message || 'Cadastro realizado com sucesso');
-        navigate('/login');
+        showToast(result.message, 'success');
+        setTimeout(() => {
+          navigate('/login');
+        }, 4000);
+  
       } else {
-        setError(result.message || 'Erro ao criar cadastro');
+        showToast(result.message || 'Erro ao criar cadastro', true);
       }
     } catch (error) {
-      setError(error.message || 'Erro ao criar cadastro');
+      showToast(error.message || 'Erro ao criar cadastro', true);
     } finally {
       setLoading(false);
     }
@@ -51,6 +56,7 @@ function SignUp() {
   return (
     <>
       <div className="login-container">
+      <Toast />
         <div className="login-card">
           <div className="login-header">
             <h2 className="login-title h3 mb-0">Criar Conta</h2>
@@ -103,10 +109,6 @@ function SignUp() {
           </form>
         </div>
       </div>
-      {error &&
-        <div className="login-error alert alert-danger text-center mt-4" role="alert">
-          {error}
-        </div>}
     </>
   );
 }

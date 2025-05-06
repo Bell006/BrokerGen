@@ -11,6 +11,7 @@ import { useAuth } from '../../contexts/AuthContext.jsx';
 import { data } from '../../constants/categoriesAndEnterprises.js';
 
 import { ConfirmationModal } from '../../components/ConfirmationModal.jsx';
+import { Toast, showToast } from '../../components/Toast.jsx';
 import { Input } from '../../components/Input.jsx';
 import { DownloadCard } from '../../components/DownloadCard.jsx';
 import { Dropdown } from '../../components/Dropdown.jsx';
@@ -30,7 +31,6 @@ function Dashboard() {
     categories: []
   });
 
-
   const [generatedImages, setGeneratedImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -39,8 +39,8 @@ function Dashboard() {
 
   const normalizeString = (str) => {
     return str
-      .normalize('NFD') 
-      .replace(/[\u0300-\u036f]/g, '') 
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
       .replace(/\/[A-Z]{2}/i, '')
       .replace(/\s+/g, '')
       .toLowerCase();
@@ -67,11 +67,6 @@ function Dashboard() {
     navigate('/login');
   };
 
-  const handleApiError = (error) => {
-    console.log('Error details:', error);
-    alert(error.response?.data?.message || 'Erro ao criar as imagens.');
-  };
-
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -88,7 +83,8 @@ function Dashboard() {
       });
 
       if (checked && formData.categories.length >= 5) {
-        alert('Selecione no máximo 5 categorias por vez.');
+        showToast('Selecione no máximo 5 categorias por vez.', 'warning');
+        return;
       }
     } else {
       setFormData({
@@ -102,14 +98,14 @@ function Dashboard() {
     e.preventDefault();
 
     if (formData.categories.length === 0) {
-      alert('Selecione ao menos uma categoria.');
+      showToast('Selecione ao menos uma categoria.', 'warning');
       return;
     }
 
     const selectedEnterpriseObj = enterprises[selectedCity]?.find(
       (enterprise) => enterprise.id === parseInt(selectedEnterprise)
     );
-    
+
     const dataToSubmit = {
       ...formData,
       city: normalizeString(selectedCity),
@@ -117,7 +113,7 @@ function Dashboard() {
     };
 
     setShowModal(true);
-    setFormData(dataToSubmit); 
+    setFormData(dataToSubmit);
   };
 
   const handleConfirmSubmit = async (e) => {
@@ -133,7 +129,7 @@ function Dashboard() {
 
       setGeneratedImages(response.data.generated_images || []);
     } catch (error) {
-      handleApiError(error);
+      showToast(error.response?.data?.message || 'Erro ao criar as imagens.', true);
     } finally {
       setLoading(false);
     }
@@ -145,6 +141,7 @@ function Dashboard() {
 
   return (
     <div className="container-fluid p-4">
+      <Toast />
       <div className="row">
         {/* Left Column (Header and Images) */}
         <div className="col-12 col-lg-6">
@@ -254,28 +251,28 @@ function Dashboard() {
                   required
                 />
 
-<div className="mb-3">
-  <label className="form-label">Categorias:</label>
+                <div className="mb-3">
+                  <label className="form-label">Categorias:</label>
 
-  {!selectedCity || !selectedEnterprise ? (
-    <p className="text-secondary mt-1 text-center py-2">Selecione uma cidade e um empreendimento</p>
-  ) : (
-    <div className="row">
-      {categories
-        .filter(category => availableCategories.includes(category.value))
-        .map((category) => (
-          <CategoryBtn
-            key={category.value}
-            id={`category-${category.value}`}
-            value={category.value}
-            checked={formData.categories.includes(category.value)}
-            onChange={handleChange}
-            label={category.label}
-          />
-        ))}
-    </div>
-  )}
-</div>
+                  {!selectedCity || !selectedEnterprise ? (
+                    <p className="text-secondary mt-1 text-center py-2">Selecione uma cidade e um empreendimento</p>
+                  ) : (
+                    <div className="row">
+                      {categories
+                        .filter(category => availableCategories.includes(category.value))
+                        .map((category) => (
+                          <CategoryBtn
+                            key={category.value}
+                            id={`category-${category.value}`}
+                            value={category.value}
+                            checked={formData.categories.includes(category.value)}
+                            onChange={handleChange}
+                            label={category.label}
+                          />
+                        ))}
+                    </div>
+                  )}
+                </div>
 
                 <button
                   type="submit"
