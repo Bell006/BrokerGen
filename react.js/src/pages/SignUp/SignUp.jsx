@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { Input } from '../../components/Input.jsx';
+import loadingIcon from '../../assets/loadingAn.svg';
 import { FaRegArrowAltCircleRight } from 'react-icons/fa';
 import './SignUp.css';
 
@@ -9,6 +10,7 @@ function SignUp() {
   const navigate = useNavigate();
   const { signup } = useAuth();
 
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [signUpData, setSignUpData] = useState({
     name: '',
@@ -28,6 +30,8 @@ function SignUp() {
     e.preventDefault();
     setError('');
 
+    setLoading(true);
+
     try {
       const result = await signup(signUpData);
 
@@ -38,8 +42,9 @@ function SignUp() {
         setError(result.message || 'Erro ao criar cadastro');
       }
     } catch (error) {
-      console.error('Signup Submission Error:', error);
       setError(error.message || 'Erro ao criar cadastro');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -78,8 +83,12 @@ function SignUp() {
               placeholder="45819"
               required
             />
-            <button type="submit" className="btn btn-primary w-100">
-              Cadastrar
+            <button
+              type="submit"
+              className="btn btn-primary w-100"
+              disabled={loading}
+            >
+              {loading ? <img src={loadingIcon} className="loadingIcon" /> : "Cadastrar"}
             </button>
 
             <div className="signUp text-center d-flex flex-column align-items-center justify-content-center mt-2">
