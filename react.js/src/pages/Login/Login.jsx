@@ -34,10 +34,10 @@ function Login() {
       if (result.broker) {
         navigate('/dashboard');
       } else {
-        showToast(result.message || 'Falha ao fazer login', true);
+        showToast(result.message || 'Falha ao fazer login', 'error', true);
       }
     } catch (error) {
-      showToast(error.message || 'Falha ao fazer login', true);
+      showToast(error.message || 'Falha ao fazer login', 'error', true);
     }
   };
 

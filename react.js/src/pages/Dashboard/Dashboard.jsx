@@ -129,7 +129,7 @@ function Dashboard() {
 
       setGeneratedImages(response.data.generated_images || []);
     } catch (error) {
-      showToast(error.response?.data?.message || 'Erro ao criar as imagens.', true);
+      showToast(error.response?.data?.message || 'Erro ao criar as imagens.', 'error', true);
     } finally {
       setLoading(false);
     }

@@ -44,10 +44,10 @@ function SignUp() {
         }, 4000);
   
       } else {
-        showToast(result.message || 'Erro ao criar cadastro', true);
+        showToast(result.message || 'Erro ao criar cadastro', 'error', true);
       }
     } catch (error) {
-      showToast(error.message || 'Erro ao criar cadastro', true);
+      showToast(error.message || 'Erro ao criar cadastro', 'error', true);
     } finally {
       setLoading(false);
     }
