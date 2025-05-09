@@ -142,7 +142,7 @@ function Dashboard() {
   return (
     <div className="container-fluid">
       <Toast />
-      <div className="row">
+      <div className="row row_100">
         {/* Left Column (Header and Images) */}
         <div className="col-lg-6">
           <div className="d-lg-flex flex-column justify-content-between ms-auto left_col_db" style={{ height: '100%' }}>
@@ -196,7 +196,7 @@ function Dashboard() {
                     </p>
                   )}
                   <div className="card-body card-body-scrollable">
-                    <div className="row">
+                    <div className="row row_100">
                       {generatedImages.map((image, index) => (
                         <div key={index} className="col-12 col-md-4 mb-3">
                           <DownloadCard
@@ -275,10 +275,7 @@ function Dashboard() {
                     )}
                   </div>
                 </div>
-
-
-
-
+                
                 <button
                   type="submit"
                   className="btn btn-primary w-100 submit_btn_db mt-4"
