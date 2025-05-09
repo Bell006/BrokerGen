@@ -10,7 +10,12 @@ from app.utils.utils_google_api import GoogleAPI
 from app.app_error import AppError
 
 load_dotenv()
-google_drive_template_folder_id = os.getenv('GOOGLE_DRIVE_TEMPLATE_FOLDER_ID')
+google_drive_folder_ids = {
+    'palmas': os.getenv('GOOGLE_DRIVE_TEMPLATE_FOLDER_ID_P'),
+    'barreiras': os.getenv('GOOGLE_DRIVE_TEMPLATE_FOLDER_ID_B'),
+    'redencao': os.getenv('GOOGLE_DRIVE_TEMPLATE_FOLDER_ID_R')
+}
+
 google_api = GoogleAPI()
 fileManager = FileManager()
 
@@ -43,96 +48,39 @@ def create_broker_images(current_broker):
         # Validates name
         UserInputValidator.validate_name(name)
         
-        box_position_feed_general = (150, 1025)
-        box_position_stories_general = (312, 1615)
-
-        box_position_stories_condicoes = (120, 1560)
-        box_position_feed_condicoes1 = (718, 955)
-        box_position_feed_condicoes2 = (120, 1020)
-
-        box_position_feed_else = (745, 1025)
-
-        category_mapping = {
-            'condicoes1': {
-                'feed': 'peça_condicoes1_feed',
-                'stories': 'peça_condicoes1_stories',
-                'box_position_feed': box_position_feed_condicoes1,
-                'box_position_stories':  box_position_stories_condicoes
-            },
-            'condicoes2': {
-                'feed': 'peça_condicoes2_feed',
-                'stories': 'peça_condicoes2_stories',
-                'box_position_feed': box_position_feed_condicoes2,
-                'box_position_stories': box_position_stories_condicoes
-            },
-            'investidor': {
-                'feed': 'peça_investidor_feed',
-                'stories': 'peça_investidor_stories',
-                'box_position_feed': box_position_feed_general,
-                'box_position_stories': box_position_stories_general
-            },
-            'localizacao': {
-                'feed': 'peça_localizacao_feed',
-                'stories': 'peça_localizacao_stories',
-                'box_position_feed': box_position_feed_else,
-                'box_position_stories': box_position_stories_general
-            },
-            'petplace': {
-                'feed': 'peça_petplace_feed',
-                'stories': 'peça_petplace_stories',
-                'box_position_feed': box_position_feed_else,
-                'box_position_stories': box_position_stories_general
-            },
-            'poliesportiva': {
-                'feed': 'peça_poliesportiva_feed',
-                'stories': 'peça_poliesportiva_stories',
-                'box_position_feed': box_position_feed_else,
-                'box_position_stories': box_position_stories_general
-            },
-            'general': {
-                'feed': 'peça_general_feed',
-                'stories': 'peça_general_stories',
-                'box_position_feed': box_position_feed_else,
-                'box_position_stories': box_position_stories_general
-            },
-            'playground': {
-                'feed': 'peça_playground_feed',
-                'stories': 'peça_playground_stories',
-                'box_position_feed': box_position_feed_else,
-                'box_position_stories': box_position_stories_general
-            },
-            'quadraAreia': {
-                'feed': 'peça_quadraAreia_feed',
-                'stories': 'peça_quadraAreia_stories',
-                'box_position_feed': box_position_feed_else,
-                'box_position_stories': box_position_stories_general
-            },
-            'areaLazer': {
-                'feed': 'peça_areaLazer_feed',
-                'stories': 'peça_areaLazer_stories',
-                'box_position_feed': box_position_feed_else,
-                'box_position_stories': box_position_stories_general
-            }
-        }
+        box_position_feed = (745, 1025)
+        box_position_stories = (312, 1615)
 
         # List to hold links for all generated images
         generated_images = []
 
+        google_drive_template_folder_id = google_drive_folder_ids.get(selected_city)
+
         # Generate images for each selected category
         for category in categories:
-            category_data = category_mapping.get(category)
-
-            if category_data:
-                feed_template = f"{category_data['feed']}_{selected_city}_{selected_enterprise}"
-                ##stories_template = f"{category_data['stories']}_{selected_city}_{selected_enterprise}"
-
-                feed_link = fileManager.generate_image(feed_template , google_drive_template_folder_id, name, formatted_phone, creci, category_data['box_position_feed'])
-                ##stories_link = fileManager.generate_image(stories_template, google_drive_template_folder_id, name, formatted_phone, creci, category_data['box_position_stories'])
+            if category:
+                feed_template = f"{category}_feed_{selected_city}_{selected_enterprise}"
+                stories_template = f"{category}_stories_{selected_city}_{selected_enterprise}"
+        
+                feed_link = None
+                stories_link = None
+        
+            try:
+                feed_link = fileManager.generate_image(feed_template, google_drive_template_folder_id, 
+                                                        name, formatted_phone, creci, box_position_feed)
+            except AppError as e:
+                print(e)
+                
+            try:
+                stories_link = fileManager.generate_image(stories_template, google_drive_template_folder_id, 
+                                                        name, formatted_phone, creci, box_position_stories)
+            except AppError as e:
+                stories_link = None
 
             generated_images.append({
                 'category': category,
                 'feed_image_url': feed_link,
-                ##'stories_image_url': stories_link
+                'stories_image_url': stories_link
             })
 
         google_api.add_to_google_sheet(data)
