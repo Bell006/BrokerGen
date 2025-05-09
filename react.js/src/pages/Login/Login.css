@@ -4,17 +4,16 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 12px;
-
-  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+  height: 100%;
   border-radius: 20px;
 }
 
 .login-card {
   background-color: white;
   border-radius: 30px 30px 20px 20px;
-  max-width: 400px;
+  max-width: 320px;
   width: 100%;
+  box-shadow: 3px -9px 48px 11px rgba(0,0,0,0.33);
 }
 
 .login-header {
@@ -57,10 +56,4 @@
 .login-form .form-control:focus {
   border-color: var(--accent-green);
   box-shadow: 0 0 0 0.2rem rgba(154, 234, 78, 0.25);
-}
-
-.login-error {
-  color: #dc3545;
-  margin-top: 10px;
-  max-width: 300px;
 }

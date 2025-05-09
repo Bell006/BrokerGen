@@ -11,26 +11,60 @@
 }
 
 .robot_icon {
-  width: 90px;
+  width: clamp(70px, 8vw, 100px);
+}
+
+.right_col_db {
+  margin-bottom: 20px;
+}
+
+.row {
+  width: 100%;
+}
+
+.submit_btn_db {
+  margin-top: 15px;
 }
 
 @media (min-width: 992px) {
-  .robot_icon {
-    width: 100px;
+  .right_col_db, .left_col_db {
+    max-width: 550px;
   }
 
-  .row {
+  .right_col_db {
+    margin-bottom: 0;
+  }
+
+  .submit_btn_db {
+    margin-top: 0;
+  }
+
+  .right_col_db {
+    min-height: 570px;
+  }
+
+  .row, form, .card-body {
     align-items: center;
+    height: 100%;
   }
 
-  .container-fluid {
-    min-width: 1000px;
+  .inputs_form_db {
+    width: 100%;
   }
 
+  .form_db {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
 
   .card-body-scrollable {
     height: 35vh;
     overflow-y: auto;
     overflow-x: hidden;
+  }
+
+  .results-card {
+    height: 290px;
   }
 }

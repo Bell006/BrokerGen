@@ -44,7 +44,7 @@ function Login() {
   return (
     <>
       <Toast />
-      <div className="login-container gap-4">
+      <div className="login-container p-4">
         <div className="login-card">
           <div className="login-header">
             <h1 className="login-title h3">Login</h1>

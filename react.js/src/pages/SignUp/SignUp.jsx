@@ -55,7 +55,7 @@ function SignUp() {
 
   return (
     <>
-      <div className="login-container">
+      <div className="login-container p-4">
       <Toast />
         <div className="login-card">
           <div className="login-header">

@@ -140,12 +140,12 @@ function Dashboard() {
   };
 
   return (
-    <div className="container-fluid p-4">
+    <div className="container-fluid">
       <Toast />
       <div className="row">
         {/* Left Column (Header and Images) */}
-        <div className="col-12 col-lg-6">
-          <div className="d-lg-flex flex-column justify-content-between " style={{ height: '100%' }}>
+        <div className="col-lg-6">
+          <div className="d-lg-flex flex-column justify-content-between ms-auto left_col_db" style={{ height: '100%' }}>
 
             {/* Header */}
             <div className="header-container">
@@ -215,68 +215,73 @@ function Dashboard() {
         </div>
 
         {/* Right Column (Form) */}
-        <div className="col-12 col-lg-6">
-          <div className="card shadow card_body_db">
+        <div className="col-lg-6">
+          <div className="card shadow right_col_db">
             <div className="card-body ">
-              <form onSubmit={handleSubmit}>
-                <Input
-                  label="Nome:"
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="Maria da Silva"
-                  required
-                />
+              <form class='form_db' onSubmit={handleSubmit}>
+                <div className="inputs_form_db">
+                  <Input
+                    label="Nome:"
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="Maria da Silva"
+                    required
+                  />
 
-                <Input
-                  label="Celular:"
-                  type="text"
-                  name='phone'
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="(64) 9 5647-7582"
-                  mask
-                  required
-                />
+                  <Input
+                    label="Celular:"
+                    type="text"
+                    name='phone'
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="(64) 9 5647-7582"
+                    mask
+                    required
+                  />
 
-                <Input
-                  type="number"
-                  className="form-control"
-                  label="CRECI:"
-                  name="creci"
-                  value={formData.creci}
-                  onChange={handleChange}
-                  placeholder='45287'
-                  required
-                />
+                  <Input
+                    type="number"
+                    className="form-control"
+                    label="CRECI:"
+                    name="creci"
+                    value={formData.creci}
+                    onChange={handleChange}
+                    placeholder='45287'
+                    required
+                  />
 
-                <div className="mb-3">
-                  <label className="form-label">Categorias:</label>
+                    <label className="form-label mb-2">Categorias:</label>
 
-                  {!selectedCity || !selectedEnterprise ? (
-                    <p className="text-secondary mt-1 text-center py-2">Selecione uma cidade e um empreendimento</p>
-                  ) : (
-                    <div className="row">
-                      {categories
-                        .filter(category => availableCategories.includes(category.value))
-                        .map((category) => (
-                          <CategoryBtn
-                            key={category.value}
-                            id={`category-${category.value}`}
-                            value={category.value}
-                            checked={formData.categories.includes(category.value)}
-                            onChange={handleChange}
-                            label={category.label}
-                          />
-                        ))}
-                    </div>
-                  )}
+                  <div className="d-flex justify-content-center align-items-center w-100">
+                    {!selectedCity || !selectedEnterprise ? (
+                      <p className="text-secondary mt-1 text-center py-2">Selecione uma cidade e um empreendimento</p>
+                    ) : (
+                      <div className="row">
+                        {categories
+                          .filter(category => availableCategories.includes(category.value))
+                          .map((category) => (
+                            <CategoryBtn
+                              key={category.value}
+                              id={`category-${category.value}`}
+                              value={category.value}
+                              checked={formData.categories.includes(category.value)}
+                              onChange={handleChange}
+                              label={category.label}
+                            />
+                          ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
+
+
+
 
                 <button
                   type="submit"
-                  className="btn btn-primary w-100"
+                  className="btn btn-primary w-100 submit_btn_db mt-4"
                   disabled={loading}
                 >
                   {loading ? 'Aguarde...' : <span>Gerar peças</span>}

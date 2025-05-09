@@ -5,20 +5,27 @@
   --light-green: #cef146;
 }
 
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 /* Global body styles */
 body {
   background: var(--primary-blue);
   font-family: "Poppins", sans-serif;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  height: 100vh;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+#root{
+  height: 100%;
 }
 
 .dashboard-wrapper {
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
   padding: 0 15px;
 }
 
@@ -35,6 +42,10 @@ body {
 }
 
 /* Global button styles */
+.container-fluid {
+  height: 100%;
+}
+
 .btn-primary {
   background-color: var(--accent-green);
   color: white;
