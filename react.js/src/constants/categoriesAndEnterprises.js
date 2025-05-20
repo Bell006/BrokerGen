@@ -7,7 +7,7 @@ export const data = {
       { id: 3, name: 'Buriti Garden Premium', categories: ['general', 'lazer_esp', 'lazer_saude', 'lazer_clube', 'lazer', 'seguranca', 'lago'] },
     ],
     'Barreiras/BA': [
-      { id: 4, name: 'Jardim Ipiranga', categories: ['general', 'investidor_a', 'investidor_b', 'localizacao', 'condicoes', 'infra', 'quadraAreia', 'lazer', 'lazer_b'] },
+      { id: 4, name: 'Jardim Ipiranga', categories: ['general', 'investidor_a', 'investidor_b', 'localizacao', 'condicoes', 'infra', 'lazer', 'lazer_b'] },
 
     ],
   },
