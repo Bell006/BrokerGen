@@ -284,7 +284,7 @@ function Dashboard() {
                 <button
                   type="submit"
                   className="btn btn-primary w-100 submit_btn_db mt-4"
-                  disabled={loading}
+                  disabled={loading || formData.categories.length === 0 || !selectedCity || !selectedEnterprise || formData.name === '' || formData.phone === '' || formData.creci === ''}
                 >
                   {loading ? 'Aguarde...' : <span>Gerar peças</span>}
                 </button>
