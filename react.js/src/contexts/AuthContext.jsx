@@ -38,6 +38,10 @@ export const AuthProvider = ({ children }) => {
         }
       } catch (error) {
         logout();
+        if (error.response?.status === 401) {
+          logout();
+          showToast('Sessão expirada. Faça login novamente.', 'error');
+        }
       }
     };
 

@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify
-import os
 from flask import request, jsonify
 from dotenv import load_dotenv
 
@@ -10,11 +9,6 @@ from app.utils.utils_google_api import GoogleAPI
 from app.app_error import AppError
 
 load_dotenv()
-google_drive_folder_ids = {
-    'palmas': os.getenv('GOOGLE_DRIVE_TEMPLATE_FOLDER_ID_P'),
-    'barreiras': os.getenv('GOOGLE_DRIVE_TEMPLATE_FOLDER_ID_B'),
-    'redencao': os.getenv('GOOGLE_DRIVE_TEMPLATE_FOLDER_ID_R')
-}
 
 google_api = GoogleAPI()
 fileManager = FileManager()
@@ -54,14 +48,19 @@ def create_broker_images(current_broker):
         # List to hold links for all generated images
         generated_images = []
 
-        google_drive_template_folder_id = google_drive_folder_ids.get(selected_city)
+        enterprise_info = google_api.get_enterprise_data(selected_enterprise, selected_city)
+        google_drive_template_folder_id = enterprise_info['folder_id']
+        categories = data.get('categories') or enterprise_info['categorias']
+        
+        formatted_city = UserInputValidator.format_filename(selected_city)
+        formatted_enterprise = UserInputValidator.format_filename(selected_enterprise)
 
         # Generate images for each selected category
         for category in categories:
             if category:
-                feed_template = f"{category}_feed_{selected_city}_{selected_enterprise}"
-                stories_template = f"{category}_stories_{selected_city}_{selected_enterprise}"
-        
+                feed_template = f"{category}_feed_{formatted_city}_{formatted_enterprise}"
+                stories_template = f"{category}_stories_{formatted_city}_{formatted_enterprise}"
+
                 feed_link = None
                 stories_link = None
         
@@ -83,7 +82,7 @@ def create_broker_images(current_broker):
                 'stories_image_url': stories_link
             })
 
-        google_api.add_to_google_sheet(data)
+        # google_api.add_to_google_sheet(data)
         fileManager.clean_up_temp_folder() 
         
         # Return the generated image URLs

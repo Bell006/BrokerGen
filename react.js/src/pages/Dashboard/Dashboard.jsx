@@ -1,14 +1,13 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Dashboard.css';
 
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 
 import robot_icon from '../../assets/robot_icon.svg';
 import loadingIcon from '../../assets/loadingAn.svg';
 import { api } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext.jsx';
-import { data } from '../../constants/categoriesAndEnterprises.js';
 
 import { ConfirmationModal } from '../../components/ConfirmationModal.jsx';
 import { Toast, showToast } from '../../components/Toast.jsx';
@@ -22,8 +21,6 @@ function Dashboard() {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
-  const { categories, enterprises } = data;
-
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -31,35 +28,33 @@ function Dashboard() {
     categories: []
   });
 
+  const [enterpriseData, setEnterpriseData] = useState([]);
   const [generatedImages, setGeneratedImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedEnterprise, setSelectedEnterprise] = useState('');
 
-  const normalizeString = (str) => {
-    return str
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/\/[A-Z]{2}/i, '')
-      .replace(/\s+/g, '')
-      .toLowerCase();
-  };
-
   // Filtra as categorias do empreendimento selecionado
-  const availableCategories = selectedEnterprise
-    ? enterprises[selectedCity]?.find(enterprise => enterprise.id === parseInt(selectedEnterprise))?.categories || []
-    : [];
+  const selectedEnterpriseData = enterpriseData.find(
+    item => item.id === selectedEnterprise && item.cidade === selectedCity
+  );
+
+  const availableCategories = selectedEnterpriseData?.categorias || [];
+  const categoryLabels = selectedEnterpriseData?.legendas || [];
 
   // Filtra as opções de cidade para o dropdown
-  const cityOptions = Object.keys(enterprises).map((city) => ({ value: city, label: city }));
+  const cityOptions = [...new Set(enterpriseData.map(item => item.cidade))]
+  .map(city => ({ value: city, label: city }));
 
   // Filtra as opções de empreendimento para o dropdown
   const enterpriseOptions = selectedCity
-    ? enterprises[selectedCity].map((enterprise) => ({
-      value: enterprise.id,
-      label: enterprise.name,
-    }))
+    ? enterpriseData
+        .filter(item => item.cidade === selectedCity)
+        .map((item, index) => ({
+          value: item.id,
+          label: item.empreendimento,
+        }))
     : [];
 
   const handleLogout = () => {
@@ -102,14 +97,12 @@ function Dashboard() {
       return;
     }
 
-    const selectedEnterpriseObj = enterprises[selectedCity]?.find(
-      (enterprise) => enterprise.id === parseInt(selectedEnterprise)
-    );
+    const selectedEnterpriseObj = selectedEnterpriseData;
 
     const dataToSubmit = {
       ...formData,
-      city: normalizeString(selectedCity),
-      enterprise: normalizeString(selectedEnterpriseObj?.name || '')
+      city: selectedCity,
+      enterprise: selectedEnterpriseObj ? selectedEnterpriseObj.empreendimento : '',
     };
 
     setShowModal(true);
@@ -138,6 +131,20 @@ function Dashboard() {
   const handleCloseModal = () => {
     setShowModal(false);
   };
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await api.get('/get_data');
+        setEnterpriseData(res.data);
+      } catch (err) {
+        console.error("Falha ao carregar os dados", err);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="container-fluid">
@@ -259,18 +266,16 @@ function Dashboard() {
                       <p className="text-secondary mt-1 text-center py-2">Selecione uma cidade e um empreendimento</p>
                     ) : (
                       <div className="row">
-                        {categories
-                          .filter(category => availableCategories.includes(category.value))
-                          .map((category) => (
-                            <CategoryBtn
-                              key={category.value}
-                              id={`category-${category.value}`}
-                              value={category.value}
-                              checked={formData.categories.includes(category.value)}
-                              onChange={handleChange}
-                              label={category.label}
-                            />
-                          ))}
+                        {availableCategories.map((value, idx) => (
+                          <CategoryBtn
+                            key={value}
+                            id={`category-${value}`}
+                            value={value}
+                            checked={formData.categories.includes(value)}
+                            onChange={handleChange}
+                            label={categoryLabels[idx] || value}
+                          />
+                        ))}
                       </div>
                     )}
                   </div>

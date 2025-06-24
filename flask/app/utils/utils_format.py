@@ -1,5 +1,6 @@
 import re
 from app.app_error import AppError
+import unicodedata
 
 class UserInputValidator:
     @staticmethod
@@ -23,3 +24,15 @@ class UserInputValidator:
 
         if len(words) < 2 or len(words) > 3:
             raise AppError("Insira apenas o primeiro nome e um sobrenome.", 400)
+        
+    @staticmethod
+    def format_filename(text):
+        if not text:
+            return ""
+        # Se houver barra, pega apenas a parte antes dela
+        if "/" in text:
+            text = text.split("/")[0]
+        text = text.lower().strip()
+        text = unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore').decode('utf-8')
+        text = text.replace(" ", "").replace("-", "")
+        return text

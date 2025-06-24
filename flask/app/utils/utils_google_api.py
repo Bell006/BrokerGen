@@ -2,9 +2,9 @@ import os
 from google.oauth2 import service_account
 import gspread
 from googleapiclient.discovery import build
-from datetime import datetime
 from io import BytesIO
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
+import unicodedata
 
 from app.app_error import AppError
 
@@ -38,23 +38,23 @@ class GoogleAPI:
             print(f"Erro ao autorizar Google Sheets: {e}")
             raise AppError("Erro ao conectar com Google Sheets", 500)
 
-    def add_to_google_sheet(self, data):
-        gc = self.get_google_sheets_service()
+    # def add_to_google_sheet(self, data):
+    #     gc = self.get_google_sheets_service()
 
-        # Abrir a planilha pelo ID ou nome
-        spreadsheet_id = os.getenv('GOOGLE_SHEET_ID')
-        sh = gc.open_by_key(spreadsheet_id)
+    #     # Abrir a planilha pelo ID ou nome
+    #     spreadsheet_id = os.getenv('GOOGLE_SHEET_ID')
+    #     sh = gc.open_by_key(spreadsheet_id)
 
-        worksheet = sh.sheet1
+    #     worksheet = sh.sheet1
 
-        current_date = datetime.now().strftime('%d/%m/%Y')
+    #     current_date = datetime.now().strftime('%d/%m/%Y')
 
-        worksheet.append_row([
-            data['name'], 
-            data['phone'], 
-            data['creci'], 
-            current_date  
-        ])
+    #     worksheet.append_row([
+    #         data['name'], 
+    #         data['phone'], 
+    #         data['creci'], 
+    #         current_date  
+    #     ])
 
     def get_file_id_by_name(self, file_name, folder_id):
         query = f"name='{file_name}.jpg' and '{folder_id}' in parents"
@@ -107,3 +107,38 @@ class GoogleAPI:
         file_link = file.get('webContentLink')
 
         return file_link
+    
+    def normalizeSheetData(self, text):
+        if not text:
+            return ""
+        text = text.lower().strip()
+        text = unicodedata.normalize('NFKD', text).encode('ASCII', 'ignore').decode('utf-8')
+        text = text.replace(" ", "").replace("-", "").replace("/", "")
+        return ''.join(e for e in text if e.isalnum())
+    
+    def get_enterprise_data(self, enterprise_name, city):
+        try:
+            gc = self.get_google_sheets_service()
+            spreadsheet_id = os.getenv('GOOGLE_SHEET_CONFIG_ID')
+            sh = gc.open_by_key(spreadsheet_id)
+            worksheet = sh.worksheet('empreendimentos')
+
+            all_rows = worksheet.get_all_values()[1:]  # ignora cabeçalho
+
+            for row in all_rows:
+                name = row[1].strip()
+                row_city = row[2].strip()
+                categories = row[3]
+                folder_id = row[4]
+
+                if name == enterprise_name.strip() and row_city == city.strip():
+                    return {
+                        'categories': [c.strip() for c in categories.split(',') if c.strip()],
+                        'folder_id': folder_id
+                    }
+            raise AppError(f"Empreendimento '{enterprise_name}' na cidade '{city}' não encontrado.", 404)
+
+        except Exception as e:
+            print(f"Erro ao buscar dados do empreendimento: {e}")
+            raise AppError("Erro ao consultar planilha de Empreendimentos", 500)
+

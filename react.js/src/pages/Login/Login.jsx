@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from "react-router";
 
 import { Toast, showToast } from '../../components/Toast.jsx';

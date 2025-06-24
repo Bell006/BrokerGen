@@ -1,5 +1,3 @@
-import React from 'react';
-
 export const Dropdown = ({ label, options, value, onChange, disabled, placeholder }) => {
   return (
     <div className="mb-3">
@@ -10,12 +8,10 @@ export const Dropdown = ({ label, options, value, onChange, disabled, placeholde
         onChange={onChange}
         disabled={disabled}
       >
-        <option value="" disabled>
-          {placeholder}
-        </option>
+        <option value="">{placeholder}</option>
         {options.map((option) => (
-          <option key={option.value || option} value={option.value || option}>
-            {option.label || option}
+          <option key={option.value} value={option.value}>
+            {option.label}
           </option>
         ))}
       </select>
