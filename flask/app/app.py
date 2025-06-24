@@ -8,6 +8,7 @@ from app.config import DevelopmentConfig, ProductionConfig
 from database import init_db
 from app.routes.auth_routes import auth_bp
 from app.routes.image_routes import image_bp
+from app.routes.data_routes import data_bp
 
 def create_app():
     load_dotenv()
@@ -38,6 +39,7 @@ def create_app():
 
     app.register_blueprint(auth_bp, url_prefix='/api')
     app.register_blueprint(image_bp, url_prefix='/api')
+    app.register_blueprint(data_bp, url_prefix='/api')
 
     return app
 
