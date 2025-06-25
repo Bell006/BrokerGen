@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 
 import robot_icon from '../../assets/robot_icon.svg';
-import loadingIcon from '../../assets/loadingAn.svg';
 import { api } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 
@@ -34,6 +33,9 @@ function Dashboard() {
   const [showModal, setShowModal] = useState(false);
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedEnterprise, setSelectedEnterprise] = useState('');
+  const [progressText, setProgressText] = useState('');
+  const [progressPercent, setProgressPercent] = useState(0);
+
 
   // Filtra as categorias do empreendimento selecionado
   const selectedEnterpriseData = enterpriseData.find(
@@ -67,7 +69,7 @@ function Dashboard() {
 
     if (type === 'checkbox') {
       const updatedCategories = checked
-        ? formData.categories.includes(value) || formData.categories.length >= 5
+        ? formData.categories.includes(value) || formData.categories.length >= 3
           ? formData.categories
           : [...formData.categories, value]
         : formData.categories.filter((category) => category !== value);
@@ -77,8 +79,8 @@ function Dashboard() {
         categories: updatedCategories,
       });
 
-      if (checked && formData.categories.length >= 5) {
-        showToast('Selecione no máximo 5 categorias por vez.', 'warning');
+      if (checked && formData.categories.length >= 3) {
+        showToast('Selecione no máximo 3 categorias por vez.', 'warning');
         return;
       }
     } else {
@@ -109,21 +111,71 @@ function Dashboard() {
     setFormData(dataToSubmit);
   };
 
-  const handleConfirmSubmit = async (e) => {
+  const handleConfirmSubmit = async () => {
     setShowModal(false);
     setLoading(true);
+    setGeneratedImages([]);
+    setProgressText('');
+    setProgressPercent(0);
 
     try {
-      setGeneratedImages([]);
-
       const response = await api.post('/create_image', formData, {
         headers: { 'Content-Type': 'application/json' }
       });
 
-      setGeneratedImages(response.data.generated_images || []);
+      const taskId = response.data.task_id;
+
+      const checkStatus = async () => {
+        try {
+          const res = await api.get(`/task_status/${taskId}`);
+          const data = res.data;
+          console.log('Task data:', data.result);
+
+          if (data.state === 'PENDING' || data.state === 'STARTED') {
+            setProgressText('Gerando imagens...');
+
+            const generated = data.result?.generated_images || [];
+
+            // Conta imagens geradas individualmente
+            let completed = 0;
+            generated.forEach(img => {
+              if (img.feed_image_url) completed += 1;
+              if (img.stories_image_url) completed += 1;
+            });
+
+            const total = data.result?.total || 1;
+            const percent = Math.floor((completed / total) * 100);
+            setProgressPercent(Math.min(percent, 99));
+
+            setTimeout(checkStatus, 3000);
+          } else if (data.state === 'SUCCESS') {
+            setProgressText('Imagens geradas com sucesso!');
+            setProgressPercent(100);
+            setGeneratedImages(data.result.generated_images || []);
+            setLoading(false);
+          } else if (data.state === 'FAILURE') {
+            showToast(data.error || 'Erro ao gerar as imagens.', 'error', true);
+            setProgressText('Erro na geração.');
+            setLoading(false);
+          }
+        } catch (err) {
+          const errorMsg = err.response?.data?.error || 'Erro ao consultar o status da tarefa.';
+          console.error('Erro ao verificar status da task', err);
+          showToast(errorMsg, 'error', true);
+          setProgressText('Erro na geração.');
+          setLoading(false);
+        }
+      };
+
+      checkStatus();
+      setFormData({
+        ...formData,
+        categories: [],
+      });
     } catch (error) {
-      showToast(error.response?.data?.message || 'Erro ao criar as imagens.', 'error', true);
-    } finally {
+      console.error(error);
+      showToast(error.response?.data?.message || 'Erro ao criar as imagens.', 'error');
+      setProgressText('Erro ao iniciar geração.');
       setLoading(false);
     }
   };
@@ -149,7 +201,7 @@ function Dashboard() {
   return (
     <div className="container-fluid">
       <Toast />
-      <div className="row row_100">
+      <div className="row row_100 p-0 m-0">
         {/* Left Column (Header and Images) */}
         <div className="col-lg-6">
           <div className="d-lg-flex flex-column justify-content-between ms-auto left_col_db" style={{ height: '100%' }}>
@@ -180,7 +232,8 @@ function Dashboard() {
                   setSelectedCity(e.target.value);
                   setSelectedEnterprise('');
                 }}
-                placeholder="Selecione uma cidade"
+                placeholder={!enterpriseData.length <= 0 ? "Selecione uma cidade" : "Carregando..."}
+                disabled={!enterpriseData.length > 0 ? true : false}
               />
 
               <Dropdown
@@ -188,24 +241,47 @@ function Dashboard() {
                 options={enterpriseOptions}
                 value={selectedEnterprise}
                 onChange={(e) => setSelectedEnterprise(e.target.value)}
-                disabled={!selectedCity}
-                placeholder="Selecione um empreendimento"
+                disabled={!selectedCity || !enterpriseData.length > 0 ? true : false}
+                placeholder={!enterpriseData.length <= 0 ? "Selecione um empreendimento" : "Carregando..."}
               />
             </div>
 
             {/* Images */}
             <div className="images-container">
               <div className="results-container">
-                <div className="results-card d-flex align-items-center mt-2 p-3">
+                <div className={`results-card mt-2 p-3 ${generatedImages.length <= 0 ? 'center-content' : ''}`}>
                   {generatedImages.length <= 0 && (
-                    <p className="text-center w-100 m-0">
-                      {loading ? <img src={loadingIcon} /> : 'Nenhuma peça gerada ainda.'}
-                    </p>
+                    <>
+                      {!loading && (
+                        <div className="w-100">
+                          <p className="mb-0">Nenhuma peça gerada ainda.</p>
+                        </div>
+                      )}
+
+                      {loading && (
+                        <div className="w-100">
+                          <p className="mb-2">{progressText}</p>
+                          <div className="progress">
+                            <div
+                              className="progress-bar progress-bar-striped progress-bar-animated"
+                              role="progressbar"
+                              aria-valuenow={progressPercent}
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                              style={{
+                                width: `${progressPercent}%`,
+                                backgroundColor: '#b0ce3a'
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </>
                   )}
                   <div className="card-body card-body-scrollable">
-                    <div className="row row_100">
+                    <div className="row m-0 p-0">
                       {generatedImages.map((image, index) => (
-                        <div key={index} className="col-12 col-md-4 mb-3">
+                        <div key={index} className="col-12 col-md-4 mb-2 mt-3">
                           <DownloadCard
                             category={image.category}
                             feedImageUrl={image.feed_image_url}
@@ -225,7 +301,7 @@ function Dashboard() {
         <div className="col-lg-6">
           <div className="card shadow right_col_db">
             <div className="card-body ">
-              <form class='form_db' onSubmit={handleSubmit}>
+              <form className='form_db' onSubmit={handleSubmit}>
                 <div className="inputs_form_db">
                   <Input
                     label="Nome:"
@@ -233,7 +309,7 @@ function Dashboard() {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    placeholder="Maria da Silva"
+                    placeholder="Nome"
                     required
                   />
 
