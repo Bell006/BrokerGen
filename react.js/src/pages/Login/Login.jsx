@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router";
+import { useLocation } from 'react-router-dom';
 
 import { Toast, showToast } from '../../components/Toast.jsx';
 import { useAuth } from '../../contexts/AuthContext.jsx';
@@ -9,6 +10,7 @@ import './Login.css';
 
 function Login() {
   let navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
 
   const [loginData, setLoginData] = useState({
@@ -40,6 +42,14 @@ function Login() {
       showToast(error.message || 'Falha ao fazer login', 'error', true);
     }
   };
+
+  useEffect(() => {
+  if (location.state?.fromSignup) {
+    showToast(location.state.message || 'Cadastro realizado com sucesso!', 'success');
+    // Limpa o state após exibir o toast (evita que apareça de novo se o usuário atualizar)
+    window.history.replaceState({}, document.title);
+  }
+}, []);
 
   return (
     <>

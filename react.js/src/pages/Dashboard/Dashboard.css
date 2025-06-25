@@ -26,9 +26,17 @@
   margin-top: 15px;
 }
 
+.results-card.center-content {
+  height: 100%; 
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+  text-align: center;
+}
+
 @media (min-width: 992px) {
   .right_col_db, .left_col_db {
-    max-width: 550px;
+    max-width: 650px;
   }
 
   .right_col_db {

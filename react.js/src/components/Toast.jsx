@@ -14,7 +14,7 @@ export const Toast = () => {
   );
 };
 
-export const showToast = (message, type = 'info', fixed = false) => {
+export const showToast = (message, type = 'info') => {
   const toastTypes = {
     success: toast.success,
     error: toast.error,
@@ -25,7 +25,6 @@ export const showToast = (message, type = 'info', fixed = false) => {
   const toastFunction = toastTypes[type] || toast.info;
 
   toastFunction(message, {
-    autoClose: fixed ? false : 3000,
     hideProgressBar: false,
     closeOnClick: true,
     pauseOnHover: true,

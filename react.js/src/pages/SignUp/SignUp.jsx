@@ -38,10 +38,9 @@ function SignUp() {
       const result = await signup(signUpData);
 
       if (result.broker) {
-        showToast(result.message, 'success');
-        setTimeout(() => {
-          navigate('/login');
-        }, 4000);
+        navigate('/login', {
+          state: { fromSignup: true, message: result.message }
+        });
   
       } else {
         showToast(result.message || 'Erro ao criar cadastro', 'error', true);
@@ -68,7 +67,7 @@ function SignUp() {
               name="name"
               value={signUpData.name}
               onChange={handleChange}
-              placeholder="Maria da Silva"
+              placeholder="Nome"
               required
             />
             <Input
