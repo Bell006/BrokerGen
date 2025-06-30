@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router';
 import robot_icon from '../../assets/robot_icon.svg';
 import { api } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext.jsx';
+import loadingAnimation from '../../assets/loadingAn.svg';
 
 import { ConfirmationModal } from '../../components/ConfirmationModal.jsx';
 import { Toast, showToast } from '../../components/Toast.jsx';
@@ -33,16 +34,11 @@ function Dashboard() {
   const [showModal, setShowModal] = useState(false);
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedEnterprise, setSelectedEnterprise] = useState('');
-  const [progressText, setProgressText] = useState('');
-  const [progressPercent, setProgressPercent] = useState(0);
-
 
   // Filtra as categorias do empreendimento selecionado
-const selectedEnterpriseData = enterpriseData?.length
-  ? enterpriseData.find(item =>
-      item.id === selectedEnterprise && item.cidade === selectedCity
-    )
-  : null;
+  const selectedEnterpriseData = enterpriseData.find(
+    item => item.id === selectedEnterprise && item.cidade === selectedCity
+  );
 
   const availableCategories = selectedEnterpriseData?.categorias || [];
   const categoryLabels = selectedEnterpriseData?.legendas || [];
@@ -113,79 +109,58 @@ const selectedEnterpriseData = enterpriseData?.length
     setFormData(dataToSubmit);
   };
 
-  const handleConfirmSubmit = async () => {
-    setShowModal(false);
-    setLoading(true);
-    setGeneratedImages([]);
-    setProgressText('');
-    setProgressPercent(0);
+ const handleConfirmSubmit = async () => {
+  setShowModal(false);
+  setLoading(true);
+  setGeneratedImages([]);
 
-    try {
-      const response = await api.post('/create_image', formData, {
-        headers: { 'Content-Type': 'application/json' }
-      });
+  try {
+    const response = await api.post('/create_image', formData, {
+      headers: { 'Content-Type': 'application/json' }
+    });
 
-      const taskId = response.data.task_id;
+    const taskId = response.data.task_id;
 
-      const checkStatus = async () => {
-        try {
-          const res = await api.get(`/task_status/${taskId}`);
-          const data = res.data;
-          console.log('Task data:', data.result);
+    const checkStatus = async () => {
+      try {
+        const res = await api.get(`/task_status/${taskId}`);
+        const data = res.data;
+        console.log('Raw task response:', data);
 
-          if (data.state === 'PENDING' || data.state === 'STARTED') {
-            setProgressText('Gerando imagens...');
-
-            const generated = data.result?.generated_images || [];
-
-            // Conta imagens geradas individualmente
-            let completed = 0;
-            generated.forEach(img => {
-              if (img.feed_image_url) completed += 1;
-              if (img.stories_image_url) completed += 1;
-            });
-
-            const total = data.result?.total || 1;
-            const percent = Math.floor((completed / total) * 100);
-            setProgressPercent(Math.min(percent, 99));
-
-            setTimeout(checkStatus, 3000);
-          } else if (data.state === 'SUCCESS') {
-            setProgressText('Imagens geradas com sucesso!');
-            setProgressPercent(100);
-            setGeneratedImages(data.result.generated_images || []);
-            setLoading(false);
-          } else if (data.state === 'FAILURE') {
-            showToast(data.error || 'Erro ao gerar as imagens.', 'error', true);
-            setProgressText('Erro na geração.');
-            setLoading(false);
-          }
-        } catch (err) {
-          const errorMsg = err.response?.data?.error || 'Erro ao consultar o status da tarefa.';
-          console.error('Erro ao verificar status da task', err);
-          showToast(errorMsg, 'error', true);
-          setProgressText('Erro na geração.');
+        if (data.state === 'PENDING' || data.state === 'STARTED') {
+          setTimeout(checkStatus, 3000);
+        } else if (data.state === 'SUCCESS') {
+          setGeneratedImages(data.result.generated_images || []);
+          setLoading(false);
+        } else if (data.state === 'FAILURE') {
+          showToast(data.error || 'Erro ao gerar as imagens.', 'error', true);
           setLoading(false);
         }
-      };
+      } catch (err) {
+        const errorMsg = err.response?.data?.error || 'Erro ao consultar o status da tarefa.';
+        console.error('Erro ao verificar status da task', err);
+        showToast(errorMsg, 'error', true);
+        setLoading(false);
+      }
+    };
 
-      checkStatus();
-      setFormData({
-        ...formData,
-        categories: [],
-      });
-    } catch (error) {
-      console.error(error);
-      showToast(error.response?.data?.message || 'Erro ao criar as imagens.', 'error');
-      setProgressText('Erro ao iniciar geração.');
-      setLoading(false);
-    }
-  };
+    checkStatus();
+
+    setFormData({
+      ...formData,
+      categories: [],
+    });
+
+  } catch (error) {
+    console.error(error);
+    showToast(error.response?.data?.message || 'Erro ao criar as imagens.', 'error');
+    setLoading(false);
+  }
+};
 
   const handleCloseModal = () => {
     setShowModal(false);
   };
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -259,25 +234,12 @@ const selectedEnterpriseData = enterpriseData?.length
                           <p className="mb-0">Nenhuma peça gerada ainda.</p>
                         </div>
                       )}
-
-                      {loading && (
-                        <div className="w-100">
-                          <p className="mb-2">{progressText}</p>
-                          <div className="progress">
-                            <div
-                              className="progress-bar progress-bar-striped progress-bar-animated"
-                              role="progressbar"
-                              aria-valuenow={progressPercent}
-                              aria-valuemin="0"
-                              aria-valuemax="100"
-                              style={{
-                                width: `${progressPercent}%`,
-                                backgroundColor: '#b0ce3a'
-                              }}
-                            />
-                          </div>
-                        </div>
-                      )}
+                    {loading && (
+                      <div className="d-flex flex-column align-items-center justify-content-center w-100">
+                        <img src={loadingAnimation} alt="Carregando..." style={{ width: '60px' }} />
+                        <p className="mt-2 mb-0">Gerando imagens...</p>
+                      </div>
+                    )}
                     </>
                   )}
                   <div className="card-body card-body-scrollable">

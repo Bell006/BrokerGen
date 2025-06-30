@@ -5,7 +5,6 @@ from app.utils.utils_files import FileManager
 from app.utils.utils_format import UserInputValidator
 from app.app_error import AppError
 from dotenv import load_dotenv
-from celery.exceptions import Ignore
 
 load_dotenv()
 
@@ -45,59 +44,26 @@ def generate_image_task(self, data):
         formatted_city = UserInputValidator.format_filename(selected_city)
         formatted_enterprise = UserInputValidator.format_filename(selected_enterprise)
 
-        total = len(categories) * 2  #cada categoria gera 2 imagens
-        progress_count = 0  #contador de imagens
-
-        self.update_state(state='STARTED', meta={
-            'status': 'started',
-            'progress': 0,
-            'total': total,
-            'generated_images': []
-        })
-
         for category in categories:
-            feed_link = None
-            stories_link = None
-
-            # Cria estrutura inicial
             image_data = {'category': category, 'feed_image_url': None, 'stories_image_url': None}
 
             try:
                 feed_template = f"{category}_feed_{formatted_city}_{formatted_enterprise}"
-                feed_link = fileManager.generate_image(
+                image_data['feed_image_url'] = fileManager.generate_image(
                     feed_template, folder_id, name, formatted_phone, creci, (745, 1025)
                 )
-                image_data['feed_image_url'] = feed_link
-                progress_count += 1
-                self.update_state(state='STARTED', meta={
-                    'status': 'processing',
-                    'progress': progress_count,
-                    'total': total,
-                    'current_category': category,
-                    'generated_images': generated_images
-                })
             except AppError as e:
                 print(e)
 
             try:
                 stories_template = f"{category}_stories_{formatted_city}_{formatted_enterprise}"
-                stories_link = fileManager.generate_image(
+                image_data['stories_image_url'] = fileManager.generate_image(
                     stories_template, folder_id, name, formatted_phone, creci, (312, 1615)
                 )
-                image_data['stories_image_url'] = stories_link
-                progress_count += 1
-                self.update_state(state='STARTED', meta={
-                    'status': 'processing',
-                    'progress': progress_count,
-                    'total': total,
-                    'current_category': category,
-                    'generated_images': generated_images
-                })
             except AppError as e:
                 print(e)
 
             generated_images.append(image_data)
-
 
         fileManager.clean_up_temp_folder()
 
