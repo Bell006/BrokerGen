@@ -38,9 +38,11 @@ function Dashboard() {
 
 
   // Filtra as categorias do empreendimento selecionado
-  const selectedEnterpriseData = enterpriseData.find(
-    item => item.id === selectedEnterprise && item.cidade === selectedCity
-  );
+const selectedEnterpriseData = enterpriseData?.length
+  ? enterpriseData.find(item =>
+      item.id === selectedEnterprise && item.cidade === selectedCity
+    )
+  : null;
 
   const availableCategories = selectedEnterpriseData?.categorias || [];
   const categoryLabels = selectedEnterpriseData?.legendas || [];
